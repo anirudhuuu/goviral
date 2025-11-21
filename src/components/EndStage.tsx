@@ -68,8 +68,8 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <Eye size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-2xl font-bold text-white tabular-nums">
-                  {viewerCount + 53}
-                </div>
+                {viewerCount + 53}
+              </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
                   Views
                 </div>
@@ -81,10 +81,10 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <MessageSquare size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-2xl font-bold text-white tabular-nums">
-                  {commentCount}
-                </div>
+                {commentCount}
+              </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-                  Messages
+                Messages
                 </div>
               </div>
             </div>
@@ -94,10 +94,10 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <Clock size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-xl font-bold font-mono text-white tabular-nums">
-                  {formatDuration(duration)}
-                </div>
+                {formatDuration(duration)}
+              </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-                  Duration
+                Duration
                 </div>
               </div>
             </div>

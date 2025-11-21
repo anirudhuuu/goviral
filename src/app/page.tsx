@@ -1,10 +1,5 @@
-import App from "@/components/App";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  );
+  redirect("/setup");
 }

@@ -49,7 +49,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      onSendMessage();
+      e.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+      if (messageInput.trim()) {
+        onSendMessage();
+      }
+      return false;
     }
   };
 
@@ -73,7 +78,29 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           />
         </div>
       )}
-      <div className="space-y-1">
+      <form
+        className="space-y-1"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.nativeEvent) {
+            e.nativeEvent.stopImmediatePropagation();
+          }
+          if (messageInput.trim()) {
+            onSendMessage();
+          }
+          return false;
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.nativeEvent) {
+              e.nativeEvent.stopImmediatePropagation();
+            }
+          }
+        }}
+      >
         <div
           className={`flex items-center space-x-2 ${
             isVertical
@@ -97,47 +124,73 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               isVertical ? "placeholder:text-white/30" : "placeholder:text-zinc-500"
             }`}
           />
-        <Button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleEmojiPicker();
-          }}
-          variant="ghost"
-          size="icon"
-          className={`transition-colors shrink-0 h-8 w-8 ${
-            isVertical
-              ? "text-white/50 hover:text-white"
-              : "text-zinc-400 hover:text-zinc-200"
-          }`}
-          aria-label="Add emoji"
-          title="Add emoji"
-        >
-          <Smile size={isVertical ? 18 : 20} />
-        </Button>
-        <Button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSendMessage();
-          }}
-          variant="ghost"
-          size="icon"
-          className={`transition-colors shrink-0 h-8 w-8 ${
-            messageInput.trim()
-              ? isVertical
-                ? "text-red-400 hover:text-red-300"
-                : "text-red-500 hover:text-red-400"
-              : isVertical
-              ? "text-white/30"
-              : "text-zinc-600"
-          }`}
-          disabled={!messageInput.trim()}
-          title="Send message"
-        >
-          <Send size={isVertical ? 18 : 20} />
-        </Button>
-      </div>
+          <Button
+            type="button"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.nativeEvent) {
+                e.nativeEvent.stopImmediatePropagation();
+              }
+              onToggleEmojiPicker();
+            }}
+            onKeyDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.nativeEvent) {
+                e.nativeEvent.stopImmediatePropagation();
+              }
+              if (e.key === "Enter") {
+                return false;
+              }
+              if (e.key === " ") {
+                onToggleEmojiPicker();
+              }
+            }}
+            variant="ghost"
+            size="icon"
+            className={`transition-colors shrink-0 h-8 w-8 ${
+              isVertical
+                ? "text-white/50 hover:text-white"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
+            aria-label="Add emoji"
+            title="Add emoji"
+          >
+            <Smile size={isVertical ? 18 : 20} />
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={0}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.nativeEvent) {
+                e.nativeEvent.stopImmediatePropagation();
+              }
+              if (messageInput.trim()) {
+                onSendMessage();
+              }
+            }}
+            variant="ghost"
+            size="icon"
+            className={`transition-colors shrink-0 h-8 w-8 ${
+              messageInput.trim()
+                ? isVertical
+                  ? "text-red-400 hover:text-red-300"
+                  : "text-red-500 hover:text-red-400"
+                : isVertical
+                ? "text-white/30"
+                : "text-zinc-600"
+            }`}
+            disabled={!messageInput.trim()}
+            title="Send message"
+          >
+            <Send size={isVertical ? 18 : 20} />
+          </Button>
+        </div>
+      </form>
       {showCharCount && (
         <div
           className={`text-xs text-right ${
@@ -153,7 +206,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           {remainingChars} characters left
         </div>
       )}
-      </div>
     </div>
   );
 };
