@@ -93,7 +93,7 @@ export const EndStage: React.FC<EndStageProps> = ({
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 sm:p-8 animate-in zoom-in duration-300">
       <Card className="bg-[#18181b] p-6 sm:p-10 rounded-3xl border-white/10 w-full max-w-lg text-center shadow-2xl space-y-8">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 rounded-full flex items-center justify-center ring-2 ring-white/10 shadow-lg">
+          <div className="w-24 h-24 bg-linear-to-br from-zinc-800/50 to-zinc-900/50 rounded-full flex items-center justify-center ring-2 ring-white/10 shadow-lg">
             <ThumbsUp size={40} className="text-white" />
           </div>
         </div>
@@ -109,7 +109,7 @@ export const EndStage: React.FC<EndStageProps> = ({
 
         <CardContent className="space-y-6">
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
+            <div className="bg-linear-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
                   <Eye size={18} className="text-zinc-300" />
@@ -122,7 +122,7 @@ export const EndStage: React.FC<EndStageProps> = ({
                 </div>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
+            <div className="bg-linear-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
                   <MessageSquare size={18} className="text-zinc-300" />
@@ -135,7 +135,7 @@ export const EndStage: React.FC<EndStageProps> = ({
                 </div>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
+            <div className="bg-linear-to-br from-zinc-900/80 to-zinc-900/40 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all group">
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
                   <Clock size={18} className="text-zinc-300" />
@@ -154,7 +154,7 @@ export const EndStage: React.FC<EndStageProps> = ({
             <Button
               onClick={handleDownload}
               variant="default"
-              className="w-full mt-2 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-semibold text-base shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full mt-2 py-4 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-semibold text-base shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <Download size={20} className="mr-2" />
               <span>Download Recording</span>

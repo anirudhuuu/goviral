@@ -93,7 +93,7 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
   return (
     <Card
       ref={cardRef}
-      className="fixed w-72 bg-black/90 backdrop-blur-xl border-white/10 text-white z-[100] shadow-2xl cursor-move"
+      className="fixed w-72 bg-black/90 backdrop-blur-xl border-white/10 text-white z-100 shadow-2xl cursor-move"
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >

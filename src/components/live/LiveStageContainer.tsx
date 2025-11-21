@@ -78,14 +78,11 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   chatContainerRef,
   onEndStream,
   onMessageChange,
-  onSendMessage,
   onToggleEmojiPicker,
   onEmojiSelect,
   onToggleMute,
   onToggleFilter,
-  onTriggerReaction,
   onQualityChange,
-  onPracticeModeChange,
   onShowPracticeStatsChange,
   onViewerCountChange,
   onPinComment,
@@ -201,15 +198,19 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         previousOrientationRef.current = orientation;
       }
     }
+
+    // Capture ref value for cleanup to avoid stale closure
+    const recorderForCleanup = mediaRecorderRef.current;
+
     return () => {
       // Only stop recording on cleanup if not changing stream
       if (isStreamChangingRef.current) return;
 
-      const recorder = mediaRecorderRef.current;
-      // Don't stop if stream is changing (handled in the effect body)
+      // Use captured ref value instead of accessing .current in cleanup
       if (
-        recorder &&
-        (recorder.state === "recording" || recorder.state === "paused") &&
+        recorderForCleanup &&
+        (recorderForCleanup.state === "recording" ||
+          recorderForCleanup.state === "paused") &&
         previousQualityRef.current === quality &&
         previousVideoDeviceRef.current === selectedVideoDeviceId &&
         previousAudioDeviceRef.current === selectedAudioDeviceId &&
@@ -227,6 +228,8 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     startRecording,
     stopRecording,
     showEndStage,
+    mediaRecorderRef,
+    streamRef,
   ]);
 
   const addComment = useCallback(
@@ -291,7 +294,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         requestAnimationFrame(scrollToBottom);
       });
     }
-  }, [comments]);
+  }, [comments, chatContainerRef]);
 
   const handleSendMessage = useCallback(() => {
     if (!messageInput.trim()) return;
@@ -431,8 +434,8 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
             {orientation === "vertical" && (
               <>
-                <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
-                <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+                <div className="absolute top-0 inset-x-0 h-32 bg-linear-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
+                <div className="absolute bottom-0 inset-x-0 h-64 bg-linear-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
               </>
             )}
           </div>
@@ -460,7 +463,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         {isPracticeMode && !showPracticeStats && (
           <Button
             onClick={() => onShowPracticeStatsChange(true)}
-            className="fixed bottom-4 right-4 z-[100] bg-red-600 hover:bg-red-700"
+            className="fixed bottom-4 right-4 z-100 bg-red-600 hover:bg-red-700"
             size="sm"
           >
             <Award size={16} className="mr-2" />

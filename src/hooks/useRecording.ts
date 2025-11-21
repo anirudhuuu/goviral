@@ -160,21 +160,21 @@ export const useRecording = (): UseRecordingReturn => {
           }
         };
 
-      mediaRecorder.onerror = (event) => {
-        if (process.env.NODE_ENV === "development") {
-          console.error("MediaRecorder error:", event);
-        }
-        
-        // On error, try to preserve existing chunks by stopping gracefully
-        // Request any remaining data before the error state
-        try {
-          if (mediaRecorder.state === "recording") {
-            mediaRecorder.requestData();
+        mediaRecorder.onerror = (event) => {
+          if (process.env.NODE_ENV === "development") {
+            console.error("MediaRecorder error:", event);
           }
-        } catch (e) {
-          // Ignore errors when requesting data during error state
-        }
-      };
+
+          // On error, try to preserve existing chunks by stopping gracefully
+          // Request any remaining data before the error state
+          try {
+            if (mediaRecorder.state === "recording") {
+              mediaRecorder.requestData();
+            }
+          } catch {
+            // Ignore errors when requesting data during error state
+          }
+        };
 
         // Start with timeslice to ensure regular data chunks
         mediaRecorder.start(1000);

@@ -107,8 +107,8 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
 
   return (
     <>
-      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
-      <div className="absolute bottom-0 inset-x-0 h-80 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
+      <div className="absolute bottom-0 inset-x-0 h-80 bg-linear-to-t from-black/95 via-black/70 to-transparent z-10 pointer-events-none" />
 
       <div className="absolute top-0 left-0 right-0 p-3 z-30 pointer-events-none">
         <div className="flex justify-between items-start">
@@ -256,7 +256,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 px-3 pb-4 pt-6 z-30 space-y-3 bg-gradient-to-t from-black/95 via-black/80 to-transparent pointer-events-auto">
+      <div className="absolute bottom-0 left-0 right-0 px-3 pb-4 pt-6 z-30 space-y-3 bg-linear-to-t from-black/95 via-black/80 to-transparent pointer-events-auto">
         <ChatInput
           messageInput={messageInput}
           showEmojiPicker={showEmojiPicker}
