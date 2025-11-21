@@ -260,7 +260,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
           <div className="flex items-center gap-2">
             <Badge
               variant="destructive"
-              className="bg-blue-600 text-white px-2.5 py-1 rounded-md font-semibold text-xs tracking-wider uppercase shadow-lg flex items-center gap-1.5"
+              className="bg-red-600 text-white px-2.5 py-1 rounded-md font-semibold text-xs tracking-wider uppercase shadow-lg flex items-center gap-1.5"
             >
               <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
               LIVE
@@ -337,7 +337,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                     onClick={onEndStream}
                     variant="destructive"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg h-7"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg h-7"
                   >
                     End
                   </Button>

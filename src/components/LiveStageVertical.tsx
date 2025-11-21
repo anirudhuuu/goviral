@@ -137,7 +137,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
           </Badge>
           <Badge
             variant="destructive"
-            className="px-3 py-1.5 bg-blue-600 rounded-md flex items-center space-x-1.5 shadow-lg shadow-blue-900/20"
+            className="px-3 py-1.5 bg-red-600 rounded-md flex items-center space-x-1.5 shadow-lg shadow-red-900/20"
           >
             <span className="uppercase text-[10px] font-semibold">Live</span>
             <span className="text-xs font-semibold border-l border-white/20 pl-1.5">
@@ -188,7 +188,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                   onClick={onEndStream}
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 bg-black/30 backdrop-blur-md rounded-full border border-white/10 text-white hover:bg-white/10"
+                  className="w-8 h-8 bg-red-600/20 backdrop-blur-md rounded-full border border-red-500/50 text-red-400 hover:bg-red-600/30 hover:border-red-500"
                 >
                   <X size={16} />
                 </Button>

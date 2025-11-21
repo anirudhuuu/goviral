@@ -353,7 +353,7 @@ export const SetupStage: React.FC<SetupStageProps> = ({
               onClick={onGoLive}
               variant="default"
               size="lg"
-              className="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-base shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-6 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-base shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse mr-2" />
               <span>Go Live</span>
