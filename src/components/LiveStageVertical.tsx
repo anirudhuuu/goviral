@@ -86,7 +86,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
       <div className="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
       <div className="absolute bottom-0 inset-x-0 h-80 bg-linear-to-t from-black/95 via-black/70 to-transparent z-10 pointer-events-none" />
 
-      <div className="absolute top-0 left-0 right-0 p-3 z-30 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 pt-3 pb-2 px-3 z-50 pointer-events-none">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
             <Badge
@@ -145,7 +145,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
         </div>
       </div>
 
-      <Card className="absolute top-16 left-3 right-3 z-20 bg-black/60 backdrop-blur-xl border-white/10 rounded-xl p-3 max-w-none">
+      <Card className="absolute top-16 left-0 right-0 z-40 bg-black/60 backdrop-blur-xl border-white/10 rounded-none border-x-0 border-t-0 p-3 max-w-none">
         <div className="flex items-start gap-2.5">
           <div className="bg-blue-500/90 p-1.5 rounded-lg text-white shrink-0">
             <Pin size={12} />
@@ -193,7 +193,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 px-3 pb-4 pt-6 z-30 space-y-3 bg-linear-to-t from-black/95 via-black/80 to-transparent pointer-events-auto">
+      <div className="absolute bottom-0 left-0 right-0 px-3 pb-4 lg:pb-6 pt-6 z-50 space-y-3 bg-linear-to-t from-black/95 via-black/80 to-transparent pointer-events-auto">
         <ChatInput
           messageInput={messageInput}
           showEmojiPicker={showEmojiPicker}

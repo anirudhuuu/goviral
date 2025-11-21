@@ -107,10 +107,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showEndStage, setShowEndStage] = useState(false);
 
-  const {
-    selectedVideoDeviceId,
-    selectedAudioDeviceId,
-  } = useMediaDevices();
+  const { selectedVideoDeviceId, selectedAudioDeviceId } = useMediaDevices();
 
   const { currentStream, streamRef } = useMediaStream({
     orientation,
@@ -159,7 +156,13 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         stopRecording();
       }
     };
-  }, [currentStream, startRecording, stopRecording, mediaRecorderRef, streamRef]);
+  }, [
+    currentStream,
+    startRecording,
+    stopRecording,
+    mediaRecorderRef,
+    streamRef,
+  ]);
 
   const addComment = useCallback(
     (comment: Comment) => {
@@ -337,7 +340,11 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   return (
     <>
       <div
-        className={`relative bg-black overflow-hidden transition-all duration-500 flex shadow-2xl lg:shadow-none ring-1 ring-white/10 lg:ring-0 ${containerClass}`}
+        className={`relative bg-black overflow-hidden transition-all duration-500 flex ${
+          orientation === "vertical"
+            ? "shadow-2xl lg:shadow-2xl ring-0"
+            : "shadow-2xl lg:shadow-none ring-1 ring-white/10 lg:ring-0"
+        } ${containerClass}`}
       >
         <div
           className={`relative w-full h-full bg-zinc-900 ${

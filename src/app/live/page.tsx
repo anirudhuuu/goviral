@@ -56,7 +56,11 @@ function LivePageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] font-sans text-white overflow-hidden flex items-center justify-center p-4 lg:p-0 lg:h-screen">
+    <div
+      className={`min-h-screen bg-[#09090b] font-sans text-white overflow-hidden flex items-center justify-center ${
+        orientation === "vertical" ? "p-0 h-screen lg:p-4" : "p-4 lg:p-0 lg:h-screen"
+      }`}
+    >
       <LiveStageContainer
         orientation={orientation}
         streamTopic={streamTopic}
