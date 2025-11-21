@@ -101,6 +101,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     startRecording,
     stopRecording,
     resetRecording,
+    resetStreamState,
     streamerName,
   } = useStreamContext();
 
@@ -451,7 +452,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
             streamerName={streamerName}
             onReturnToStudio={() => {
               setShowEndStage(false);
-              resetRecording();
+              resetStreamState();
               onEndStream();
             }}
           />

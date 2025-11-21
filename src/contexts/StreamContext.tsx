@@ -55,6 +55,7 @@ interface StreamContextType {
   startRecording: (stream: MediaStream, preserveChunks?: boolean) => void;
   stopRecording: () => void;
   resetRecording: () => void;
+  resetStreamState: () => void;
 }
 
 const StreamContext = createContext<StreamContextType | undefined>(undefined);
@@ -141,6 +142,23 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
     );
   }, []);
 
+  const resetStreamState = useCallback(() => {
+    // Reset all stream-related state
+    setComments([]);
+    setReactions([]);
+    setMessageInput("");
+    setShowEmojiPicker(false);
+    setViewerCountState(0);
+    setCurrentFilter(0);
+    setIsMuted(false);
+    setIsVideoEnabled(true);
+    setIsPracticeMode(false);
+    setShowPracticeStats(true);
+    lastReactionTimeRef.current = 0;
+    // Reset recording state
+    resetRecording();
+  }, [resetRecording]);
+
   const value: StreamContextType = {
     orientation,
     streamTopic,
@@ -184,6 +202,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
     startRecording,
     stopRecording,
     resetRecording,
+    resetStreamState,
   };
 
   return (
