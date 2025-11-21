@@ -79,7 +79,12 @@ const App: React.FC = () => {
     setSelectedAudioDeviceId,
   } = useMediaDevices();
 
-  const { currentStream, streamRef } = useMediaStream({
+  const {
+    currentStream,
+    streamRef,
+    error: mediaError,
+    isLoading: isMediaLoading,
+  } = useMediaStream({
     orientation,
     selectedVideoDeviceId,
     selectedAudioDeviceId,
@@ -95,8 +100,13 @@ const App: React.FC = () => {
     stage === "live" && isPracticeMode
   );
 
-  const { downloadUrl, duration, startRecording, stopRecording, resetRecording } =
-    useRecording();
+  const {
+    downloadUrl,
+    duration,
+    startRecording,
+    stopRecording,
+    resetRecording,
+  } = useRecording();
 
   const viewerCount = useViewerCount(stage);
 
@@ -114,6 +124,8 @@ const App: React.FC = () => {
     );
   }, []);
 
+  const reactionTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
   const triggerBurst = useCallback((type: string) => {
     const now = Date.now();
     if (now - lastReactionTimeRef.current < REACTION_CONFIG.DEBOUNCE_TIME)
@@ -128,13 +140,21 @@ const App: React.FC = () => {
             1)
       ) + REACTION_CONFIG.BURST_COUNT_MIN;
     for (let i = 0; i < count; i++) {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setReactions((prev) => [
           ...prev,
           { id: Date.now() + Math.random(), type },
         ]);
       }, i * REACTION_CONFIG.BURST_DELAY);
+      reactionTimeoutsRef.current.push(timeout);
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      reactionTimeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+      reactionTimeoutsRef.current = [];
+    };
   }, []);
 
   useAIComments({
@@ -153,7 +173,7 @@ const App: React.FC = () => {
             chatContainerRef.current.scrollHeight;
         }
       };
-      
+
       requestAnimationFrame(() => {
         requestAnimationFrame(scrollToBottom);
       });
@@ -173,7 +193,15 @@ const App: React.FC = () => {
   }, []);
 
   const goLive = useCallback(() => {
-    if (!streamTopic.trim()) return;
+    if (!streamTopic.trim() || !streamerName.trim()) {
+      alert("Please enter both your name and a stream title");
+      return;
+    }
+
+    if (!currentStream) {
+      alert("Camera not ready. Please check your permissions.");
+      return;
+    }
 
     setStage("live");
     setViewerCountState(VIEWER_COUNT_CONFIG.INITIAL_COUNT);
@@ -190,6 +218,8 @@ const App: React.FC = () => {
     }
   }, [
     streamTopic,
+    streamerName,
+    currentStream,
     streamRef,
     startRecording,
     resetRecording,
@@ -246,64 +276,16 @@ const App: React.FC = () => {
   });
 
   const containerClass = getContainerClassName(orientation);
+  const isSetupStage = stage === "setup";
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4 font-sans text-white overflow-hidden">
-      <div
-        className={`relative bg-black overflow-hidden shadow-2xl ring-1 ring-white/10 transition-all duration-500 flex ${containerClass}`}
-      >
-        <div
-          className={`relative w-full h-full bg-zinc-900 ${
-            orientation === "horizontal" ? "flex" : ""
-          }`}
-        >
-          <div
-            className={`relative overflow-hidden ${
-              orientation === "horizontal" ? "flex-1 h-full" : "w-full h-full"
-            }`}
-          >
-            <VideoFeed
-              stream={currentStream}
-              filterClass={VIDEO_FILTERS[currentFilter].class}
-            />
-
-            {stage === "live" && orientation === "vertical" && (
-              <>
-                <div className="absolute top-0 inset-x-0 h-32 bg-linear-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
-                <div className="absolute bottom-0 inset-x-0 h-64 bg-linear-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
-              </>
-            )}
-          </div>
-
-          {orientation === "horizontal" && stage === "live" && (
-            <LiveStageHorizontal
-              viewerCount={viewerCountState}
-              duration={duration}
-              streamTopic={streamTopic}
-              comments={comments}
-              messageInput={messageInput}
-              showEmojiPicker={showEmojiPicker}
-              devices={devices}
-              selectedVideoDeviceId={selectedVideoDeviceId}
-              selectedAudioDeviceId={selectedAudioDeviceId}
-              selectedQuality={quality}
-              chatContainerRef={chatContainerRef}
-              onEndStream={handleEndStreamClick}
-              onMessageChange={setMessageInput}
-              onSendMessage={handleSendMessage}
-              onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
-              onEmojiSelect={handleEmojiSelect}
-              onTriggerReaction={triggerBurst}
-              onVideoDeviceChange={setSelectedVideoDeviceId}
-              onAudioDeviceChange={setSelectedAudioDeviceId}
-              onQualityChange={setQuality}
-              onPinComment={handlePinComment}
-              onUnpinComment={handleUnpinComment}
-            />
-          )}
-        </div>
-
-        {stage === "setup" && (
+    <div className={`min-h-screen bg-[#09090b] font-sans text-white overflow-hidden ${
+      isSetupStage 
+        ? "w-full h-screen" 
+        : "flex items-center justify-center p-4 lg:p-0 lg:h-screen"
+    }`}>
+      {isSetupStage ? (
+        stage === "setup" && (
           <SetupStage
             orientation={orientation}
             streamTopic={streamTopic}
@@ -329,6 +311,66 @@ const App: React.FC = () => {
             onQualityChange={setQuality}
             onPracticeModeChange={setIsPracticeMode}
           />
+        )
+      ) : (
+      <div
+        className={`relative bg-black overflow-hidden transition-all duration-500 flex shadow-2xl lg:shadow-none ring-1 ring-white/10 lg:ring-0 ${containerClass}`}
+      >
+        {stage === "live" && (
+          <div
+            className={`relative w-full h-full bg-zinc-900 ${
+              orientation === "horizontal" ? "flex" : ""
+            }`}
+          >
+            <div
+              className={`relative overflow-hidden ${
+                orientation === "horizontal" ? "flex-1 h-full" : "w-full h-full"
+              }`}
+            >
+              <VideoFeed
+                stream={currentStream}
+                filterClass={VIDEO_FILTERS[currentFilter].class}
+              />
+
+              {orientation === "vertical" && (
+                <>
+                  <div className="absolute top-0 inset-x-0 h-32 bg-linear-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
+                  <div className="absolute bottom-0 inset-x-0 h-64 bg-linear-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+                </>
+              )}
+            </div>
+
+            {orientation === "horizontal" && (
+            <LiveStageHorizontal
+              viewerCount={viewerCountState}
+              duration={duration}
+              streamTopic={streamTopic}
+              comments={comments}
+              messageInput={messageInput}
+              showEmojiPicker={showEmojiPicker}
+              isMuted={isMuted}
+              currentFilter={currentFilter}
+              devices={devices}
+              selectedVideoDeviceId={selectedVideoDeviceId}
+              selectedAudioDeviceId={selectedAudioDeviceId}
+              selectedQuality={quality}
+              chatContainerRef={chatContainerRef}
+              onEndStream={handleEndStreamClick}
+              onMessageChange={setMessageInput}
+              onSendMessage={handleSendMessage}
+              onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
+              onEmojiSelect={handleEmojiSelect}
+              onToggleMute={() => setIsMuted(!isMuted)}
+              onToggleFilter={toggleFilter}
+              onTriggerReaction={triggerBurst}
+              onVideoDeviceChange={setSelectedVideoDeviceId}
+              onAudioDeviceChange={setSelectedAudioDeviceId}
+              onQualityChange={setQuality}
+              onPinComment={handlePinComment}
+              onUnpinComment={handleUnpinComment}
+            />
+            )}
+          </div>
         )}
 
         {stage === "live" && orientation === "vertical" && (
@@ -435,6 +477,7 @@ const App: React.FC = () => {
           />
         )}
       </div>
+      )}
     </div>
   );
 };

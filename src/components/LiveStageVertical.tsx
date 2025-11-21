@@ -137,10 +137,10 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
           </Badge>
           <Badge
             variant="destructive"
-            className="px-3 py-1.5 bg-red-600 rounded-md flex items-center space-x-1.5 shadow-lg shadow-red-900/20"
+            className="px-3 py-1.5 bg-blue-600 rounded-md flex items-center space-x-1.5 shadow-lg shadow-blue-900/20"
           >
-            <span className="uppercase text-[10px] font-black">Live</span>
-            <span className="text-xs font-bold border-l border-white/20 pl-1.5">
+            <span className="uppercase text-[10px] font-semibold">Live</span>
+            <span className="text-xs font-semibold border-l border-white/20 pl-1.5">
               {viewerCount}
             </span>
           </Badge>
@@ -273,7 +273,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                   size="icon"
                   className={`w-11 h-11 rounded-full backdrop-blur-lg border transition ${
                     isMuted
-                      ? "bg-red-500/20 border-red-500 text-red-500"
+                      ? "bg-amber-500/20 border-amber-500 text-amber-400"
                       : "bg-white/10 border-white/10"
                   }`}
                 >
@@ -316,7 +316,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                   }}
                   variant="default"
                   size="icon"
-                  className="w-11 h-11 rounded-full bg-linear-to-tr from-red-500 to-pink-600 shadow-lg shadow-red-500/20 text-white"
+                  className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 text-white"
                 >
                   <Heart size={20} fill="currentColor" />
                 </Button>

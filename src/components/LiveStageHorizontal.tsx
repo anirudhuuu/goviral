@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Eye, Settings, Pin, User, Heart } from "lucide-react";
+import { Eye, Settings, Pin, User, Heart, Mic, MicOff, Sparkles } from "lucide-react";
 import { CommentItem } from "./CommentItem";
 import { ChatInput } from "./ChatInput";
 import { DeviceSettings } from "./DeviceSettings";
@@ -29,6 +29,8 @@ interface LiveStageHorizontalProps {
   comments: Comment[];
   messageInput: string;
   showEmojiPicker: boolean;
+  isMuted: boolean;
+  currentFilter: number;
   devices: MediaDeviceInfo[];
   selectedVideoDeviceId: string;
   selectedAudioDeviceId: string;
@@ -39,6 +41,8 @@ interface LiveStageHorizontalProps {
   onSendMessage: () => void;
   onToggleEmojiPicker: () => void;
   onEmojiSelect: (emoji: string) => void;
+  onToggleMute: () => void;
+  onToggleFilter: () => void;
   onTriggerReaction: (type: string) => void;
   onVideoDeviceChange: (deviceId: string) => void;
   onAudioDeviceChange: (deviceId: string) => void;
@@ -54,6 +58,8 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
   comments,
   messageInput,
   showEmojiPicker,
+  isMuted,
+  currentFilter,
   devices,
   selectedVideoDeviceId,
   selectedAudioDeviceId,
@@ -64,6 +70,8 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
   onSendMessage,
   onToggleEmojiPicker,
   onEmojiSelect,
+  onToggleMute,
+  onToggleFilter,
   onTriggerReaction,
   onVideoDeviceChange,
   onAudioDeviceChange,
@@ -175,11 +183,64 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      onToggleMute();
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className={`flex-1 hover:bg-zinc-800 border border-zinc-700/50 h-9 ${
+                      isMuted
+                        ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                        : "bg-zinc-800/60 text-zinc-300"
+                    }`}
+                  >
+                    {isMuted ? (
+                      <MicOff size={16} className="mr-1.5" />
+                    ) : (
+                      <Mic size={16} className="mr-1.5" />
+                    )}
+                    <span className="text-xs font-medium">
+                      {isMuted ? "Unmute" : "Mute"}
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isMuted ? "Unmute Microphone" : "Mute Microphone"}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFilter();
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/50 h-9"
+                  >
+                    <Sparkles
+                      size={16}
+                      className={`mr-1.5 ${currentFilter !== 0 ? "text-blue-400" : ""}`}
+                    />
+                    <span className="text-xs font-medium">Filter</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Change Video Filter</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onTriggerReaction("love");
                     }}
                     variant="ghost"
                     size="sm"
-                    className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-red-400 hover:text-red-300 border border-zinc-700/50 h-9"
+                    className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-blue-400 hover:text-blue-300 border border-zinc-700/50 h-9"
                   >
                     <Heart size={16} fill="currentColor" className="mr-1.5" />
                     <span className="text-xs font-medium">React</span>
@@ -199,7 +260,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
           <div className="flex items-center gap-2">
             <Badge
               variant="destructive"
-              className="bg-red-600 text-white px-2.5 py-1 rounded-md font-bold text-xs tracking-wider uppercase shadow-lg flex items-center gap-1.5"
+              className="bg-blue-600 text-white px-2.5 py-1 rounded-md font-semibold text-xs tracking-wider uppercase shadow-lg flex items-center gap-1.5"
             >
               <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
               LIVE
@@ -276,7 +337,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                     onClick={onEndStream}
                     variant="destructive"
                     size="sm"
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-bold shadow-lg h-7"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg h-7"
                   >
                     End
                   </Button>

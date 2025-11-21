@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Smile, Send } from "lucide-react";
 import { StreamOrientation } from "@/types";
+import { COMMENT_CONFIG } from "@/constants";
 
 interface ChatInputProps {
   messageInput: string;
@@ -53,6 +54,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const isVertical = orientation === "vertical";
+  const remainingChars = COMMENT_CONFIG.MAX_MESSAGE_LENGTH - messageInput.length;
+  const showCharCount = messageInput.length > COMMENT_CONFIG.MAX_MESSAGE_LENGTH * 0.8;
 
   return (
     <div className="relative">
@@ -70,23 +73,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           />
         </div>
       )}
-      <div
-        className={`flex items-center space-x-2 ${
-          isVertical
-            ? "bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 border border-white/5"
-            : "bg-zinc-800/60 rounded-lg px-3 py-2.5 border border-zinc-700/50 hover:bg-zinc-800/80 transition-colors"
-        }`}
-      >
-        <Input
-          type="text"
-          placeholder={isVertical ? "Add a comment..." : "Send a message..."}
-          value={messageInput}
-          onChange={(e) => onMessageChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className={`bg-transparent border-none outline-none text-sm text-white flex-1 h-auto p-0 focus-visible:ring-0 ${
-            isVertical ? "placeholder:text-white/30" : "placeholder:text-zinc-500"
+      <div className="space-y-1">
+        <div
+          className={`flex items-center space-x-2 ${
+            isVertical
+              ? "bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 border border-white/5"
+              : "bg-zinc-800/60 rounded-lg px-3 py-2.5 border border-zinc-700/50 hover:bg-zinc-800/80 transition-colors"
           }`}
-        />
+        >
+          <Input
+            type="text"
+            placeholder={isVertical ? "Add a comment..." : "Send a message..."}
+            value={messageInput}
+            onChange={(e) => {
+              if (e.target.value.length <= COMMENT_CONFIG.MAX_MESSAGE_LENGTH) {
+                onMessageChange(e.target.value);
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            aria-label="Chat message input"
+            maxLength={COMMENT_CONFIG.MAX_MESSAGE_LENGTH}
+            className={`bg-transparent border-none outline-none text-sm text-white flex-1 h-auto p-0 focus-visible:ring-0 ${
+              isVertical ? "placeholder:text-white/30" : "placeholder:text-zinc-500"
+            }`}
+          />
         <Button
           type="button"
           onClick={(e) => {
@@ -100,6 +110,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               ? "text-white/50 hover:text-white"
               : "text-zinc-400 hover:text-zinc-200"
           }`}
+          aria-label="Add emoji"
           title="Add emoji"
         >
           <Smile size={isVertical ? 18 : 20} />
@@ -126,6 +137,22 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         >
           <Send size={isVertical ? 18 : 20} />
         </Button>
+      </div>
+      {showCharCount && (
+        <div
+          className={`text-xs text-right ${
+            remainingChars < 20
+              ? "text-red-400"
+              : remainingChars < 50
+              ? "text-amber-400"
+              : isVertical
+              ? "text-white/40"
+              : "text-zinc-500"
+          }`}
+        >
+          {remainingChars} characters left
+        </div>
+      )}
       </div>
     </div>
   );
