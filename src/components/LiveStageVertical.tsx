@@ -17,16 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  User,
-  X,
-  Settings,
-  Mic,
-  MicOff,
-  Sparkles,
-  Heart,
-  Pin,
-} from "lucide-react";
+import { Eye, Settings, Mic, MicOff, Sparkles, Heart, Pin } from "lucide-react";
 import { CommentItem } from "./CommentItem";
 import { ChatInput } from "./ChatInput";
 import { DeviceSettings } from "./DeviceSettings";
@@ -36,7 +27,6 @@ interface LiveStageVerticalProps {
   viewerCount: number;
   duration: number;
   streamTopic: string;
-  streamerName: string;
   comments: Comment[];
   messageInput: string;
   showEmojiPicker: boolean;
@@ -66,7 +56,6 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
   viewerCount,
   duration,
   streamTopic,
-  streamerName,
   comments,
   messageInput,
   showEmojiPicker,
@@ -112,92 +101,99 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
       <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
       <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
 
-      <div className="absolute top-0 left-0 right-0 p-4 pt-12 z-30 flex justify-between items-start">
-        <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-xl rounded-full p-1 pr-4 border border-white/5">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-600 flex items-center justify-center">
-            <User size={14} className="text-white" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold leading-none text-zinc-300 mb-0.5">
-              {streamerName}
-            </span>
-            <span className="text-[10px] font-bold leading-none text-white">
+      <div className="absolute top-0 left-0 right-0 p-3 z-30 pointer-events-none">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="destructive"
+              className="bg-red-600 text-white px-2.5 py-1 rounded-md font-semibold text-xs tracking-wider uppercase shadow-lg flex items-center gap-1.5"
+            >
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
               LIVE
-            </span>
+            </Badge>
+            <Badge
+              variant="outline"
+              className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border-white/10 flex items-center text-white"
+            >
+              <span className="text-xs font-mono font-bold tabular-nums">
+                {formatDuration(duration)}
+              </span>
+            </Badge>
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Badge
-            variant="outline"
-            className="px-2.5 py-1 bg-black/30 backdrop-blur-md border-white/10 rounded-md flex items-center text-white"
-          >
-            <span className="text-xs font-mono font-bold tabular-nums">
-              {formatDuration(duration)}
-            </span>
-          </Badge>
-          <Badge
-            variant="destructive"
-            className="px-3 py-1.5 bg-red-600 rounded-md flex items-center space-x-1.5 shadow-lg shadow-red-900/20"
-          >
-            <span className="uppercase text-[10px] font-semibold">Live</span>
-            <span className="text-xs font-semibold border-l border-white/20 pl-1.5">
-              {viewerCount}
-            </span>
-          </Badge>
-          <TooltipProvider>
-            <Tooltip>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 bg-black/30 backdrop-blur-md rounded-full border border-white/10 text-white hover:bg-white/10"
-                    >
-                      <Settings size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                </SheetTrigger>
-                <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
-                  <SheetHeader className="p-6 border-b border-white/10">
-                    <SheetTitle className="text-white">
-                      Stream Settings
-                    </SheetTitle>
-                    <SheetDescription className="text-zinc-400">
-                      Configure your audio and video devices.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <DeviceSettings
-                    devices={devices}
-                    selectedVideoDeviceId={selectedVideoDeviceId}
-                    selectedAudioDeviceId={selectedAudioDeviceId}
-                    selectedQuality={selectedQuality}
-                    onVideoDeviceChange={onVideoDeviceChange}
-                    onAudioDeviceChange={onAudioDeviceChange}
-                    onQualityChange={onQualityChange}
-                  />
-                </SheetContent>
-              </Sheet>
-              <TooltipContent>
-                <p>Device Settings</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={onEndStream}
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 bg-red-600/20 backdrop-blur-md rounded-full border border-red-500/50 text-red-400 hover:bg-red-600/30 hover:border-red-500"
-                >
-                  <X size={16} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>End Stream</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="flex items-center gap-2 pointer-events-auto">
+            <Sheet>
+              <TooltipProvider>
+                <Tooltip>
+                  <SheetTrigger asChild>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 bg-black/70 backdrop-blur-md rounded-md border border-white/10 text-zinc-400 hover:text-white hover:bg-black/90"
+                      >
+                        <Settings size={14} />
+                      </Button>
+                    </TooltipTrigger>
+                  </SheetTrigger>
+                  <TooltipContent>
+                    <p>Settings</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
+                <SheetHeader className="p-6 border-b border-white/10">
+                  <SheetTitle className="text-white">
+                    Stream Settings
+                  </SheetTitle>
+                  <SheetDescription className="text-zinc-400">
+                    Configure your audio and video devices.
+                  </SheetDescription>
+                </SheetHeader>
+                <DeviceSettings
+                  devices={devices}
+                  selectedVideoDeviceId={selectedVideoDeviceId}
+                  selectedAudioDeviceId={selectedAudioDeviceId}
+                  selectedQuality={selectedQuality}
+                  onVideoDeviceChange={onVideoDeviceChange}
+                  onAudioDeviceChange={onAudioDeviceChange}
+                  onQualityChange={onQualityChange}
+                />
+              </SheetContent>
+            </Sheet>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge
+                    variant="outline"
+                    className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border-white/10 flex items-center gap-1.5 cursor-default"
+                  >
+                    <Eye size={12} className="text-zinc-400" />
+                    <span className="text-xs font-bold">{viewerCount}</span>
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Live Viewers</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={onEndStream}
+                    variant="destructive"
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg h-7"
+                  >
+                    End
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>End Stream</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
       </div>
 
@@ -259,7 +255,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
           onToggleEmojiPicker={onToggleEmojiPicker}
           onEmojiSelect={onEmojiSelect}
         />
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -270,18 +266,25 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                     onToggleMute();
                   }}
                   variant="ghost"
-                  size="icon"
-                  className={`w-11 h-11 rounded-full backdrop-blur-lg border transition ${
+                  size="sm"
+                  className={`flex-1 hover:bg-zinc-800 border border-zinc-700/50 h-9 ${
                     isMuted
-                      ? "bg-amber-500/20 border-amber-500 text-amber-400"
-                      : "bg-white/10 border-white/10"
+                      ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                      : "bg-zinc-800/60 text-zinc-300"
                   }`}
                 >
-                  {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+                  {isMuted ? (
+                    <MicOff size={16} className="mr-1.5" />
+                  ) : (
+                    <Mic size={16} className="mr-1.5" />
+                  )}
+                  <span className="text-xs font-medium">
+                    {isMuted ? "Unmute" : "Mute"}
+                  </span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{isMuted ? "Unmute" : "Mute"}</p>
+                <p>{isMuted ? "Unmute Microphone" : "Mute Microphone"}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -293,17 +296,20 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                     onToggleFilter();
                   }}
                   variant="ghost"
-                  size="icon"
-                  className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-lg border border-white/10"
+                  size="sm"
+                  className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/50 h-9"
                 >
                   <Sparkles
-                    size={20}
-                    className={currentFilter !== 0 ? "text-red-400" : ""}
+                    size={16}
+                    className={`mr-1.5 ${
+                      currentFilter !== 0 ? "text-red-400" : ""
+                    }`}
                   />
+                  <span className="text-xs font-medium">Filter</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Change Filter</p>
+                <p>Change Video Filter</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -314,11 +320,12 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                     e.stopPropagation();
                     onTriggerReaction("love");
                   }}
-                  variant="default"
-                  size="icon"
-                  className="w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20 text-white"
+                  variant="ghost"
+                  size="sm"
+                  className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-red-400 hover:text-red-300 border border-zinc-700/50 h-9"
                 >
-                  <Heart size={20} fill="currentColor" />
+                  <Heart size={16} fill="currentColor" className="mr-1.5" />
+                  <span className="text-xs font-medium">React</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>

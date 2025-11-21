@@ -384,7 +384,6 @@ const App: React.FC = () => {
               viewerCount={viewerCountState}
               duration={duration}
               streamTopic={streamTopic}
-              streamerName={streamerName}
               comments={comments}
               messageInput={messageInput}
               showEmojiPicker={showEmojiPicker}
