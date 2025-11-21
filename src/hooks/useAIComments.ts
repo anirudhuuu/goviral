@@ -36,31 +36,39 @@ export const useAIComments = ({
       // Update state immediately to prevent duplicate processing
       setLastProcessedTranscript(transcriptBuffer);
 
-      const aiData = await aiService.generateResponse(
-        newText,
-        transcriptBuffer.substring(0, currentLastLength), // Use the old lastProcessedTranscript value
-        streamTopic
-      );
-
-      if (aiData && aiData.comments) {
-        const baseDelay = Math.random() * 2000 + 1000;
-        aiData.comments.forEach(
-          (c: { user?: string; text: string }, i: number) => {
-            const jitter = Math.random() * 1500;
-            const timeout = setTimeout(() => {
-              onAddComment(createComment(c.user || "Guest", c.text, false));
-            }, baseDelay + i * COMMENT_CONFIG.ANIMATION_DELAY + jitter);
-            timeoutsRef.current.push(timeout);
-          }
+      try {
+        const aiData = await aiService.generateResponse(
+          newText,
+          transcriptBuffer.substring(0, currentLastLength), // Use the old lastProcessedTranscript value
+          streamTopic
         );
 
-        if (aiData.dominantReaction) {
-          const reactionDelay = Math.random() * 2000 + 1500;
-          const timeout = setTimeout(
-            () => onTriggerReaction(aiData.dominantReaction),
-            reactionDelay
+        if (aiData && aiData.comments && Array.isArray(aiData.comments)) {
+          const baseDelay = Math.random() * 2000 + 1000;
+          aiData.comments.forEach(
+            (c: { user?: string; text: string }, i: number) => {
+              if (!c || !c.text) return; // Skip invalid comments
+              const jitter = Math.random() * 1500;
+              const timeout = setTimeout(() => {
+                onAddComment(createComment(c.user || "Guest", c.text, false));
+              }, baseDelay + i * COMMENT_CONFIG.ANIMATION_DELAY + jitter);
+              timeoutsRef.current.push(timeout);
+            }
           );
-          timeoutsRef.current.push(timeout);
+
+          if (aiData.dominantReaction) {
+            const reactionDelay = Math.random() * 2000 + 1500;
+            const timeout = setTimeout(
+              () => onTriggerReaction(aiData.dominantReaction),
+              reactionDelay
+            );
+            timeoutsRef.current.push(timeout);
+          }
+        }
+      } catch (error) {
+        // Silently handle errors - AI service already logs them
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Error processing transcript:", error);
         }
       }
     }

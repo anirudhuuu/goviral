@@ -20,6 +20,7 @@ export const useRecording = (): UseRecordingReturn => {
   const chunksRef = useRef<Blob[]>([]);
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   const startRecording = useCallback((stream: MediaStream) => {
     chunksRef.current = [];
@@ -84,6 +85,9 @@ export const useRecording = (): UseRecordingReturn => {
       mediaRecorder.onstop = () => {
         // Wait a bit to ensure all data chunks are collected
         setTimeout(() => {
+          // Check if component is still mounted before updating state
+          if (!isMountedRef.current) return;
+
           if (chunksRef.current.length > 0) {
             let finalMimeType =
               mediaRecorder.mimeType || mimeType || "video/mp4";
@@ -195,7 +199,7 @@ export const useRecording = (): UseRecordingReturn => {
     ) {
       try {
         mediaRecorderRef.current.stop();
-      } catch (e) {
+      } catch {
         // Ignore errors
       }
     }
@@ -216,7 +220,11 @@ export const useRecording = (): UseRecordingReturn => {
   }, []);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     return () => {
+      isMountedRef.current = false;
+
       // Cleanup on unmount
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -230,7 +238,7 @@ export const useRecording = (): UseRecordingReturn => {
       ) {
         try {
           mediaRecorderRef.current.stop();
-        } catch (e) {
+        } catch {
           // Ignore errors during cleanup
         }
       }

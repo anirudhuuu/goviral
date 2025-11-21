@@ -58,6 +58,24 @@ export class AIService {
       }
 
       const data = await response.json();
+
+      // Validate response structure
+      if (
+        !data ||
+        !data.candidates ||
+        !Array.isArray(data.candidates) ||
+        data.candidates.length === 0 ||
+        !data.candidates[0] ||
+        !data.candidates[0].content ||
+        !data.candidates[0].content.parts ||
+        !Array.isArray(data.candidates[0].content.parts) ||
+        data.candidates[0].content.parts.length === 0 ||
+        !data.candidates[0].content.parts[0] ||
+        !data.candidates[0].content.parts[0].text
+      ) {
+        throw new Error("Invalid API response structure");
+      }
+
       const text = data.candidates[0].content.parts[0].text;
       return JSON.parse(text) as AIResponse;
     } catch (error) {

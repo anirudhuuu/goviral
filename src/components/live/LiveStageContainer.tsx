@@ -150,9 +150,12 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
       }
     }
     return () => {
-      // Stop recording on cleanup
+      // Stop recording on cleanup - capture ref value
       const recorder = mediaRecorderRef.current;
-      if (recorder && recorder.state !== "inactive") {
+      if (
+        recorder &&
+        (recorder.state === "recording" || recorder.state === "paused")
+      ) {
         stopRecording();
       }
     };
@@ -240,19 +243,35 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     recognitionRef.current?.stop();
 
     const mediaRecorder = mediaRecorderRef.current;
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    let navigationTimeout: NodeJS.Timeout | null = null;
+
+    const navigateToEnd = () => {
+      if (navigationTimeout) {
+        clearTimeout(navigationTimeout);
+      }
+      navigationTimeout = setTimeout(() => {
+        router.push("/end");
+      }, 500);
+    };
+
+    if (
+      mediaRecorder &&
+      (mediaRecorder.state === "recording" || mediaRecorder.state === "paused")
+    ) {
+      // Add event listener before stopping to ensure we catch the stop event
       const handleStop = () => {
-        setTimeout(() => {
-          router.push("/end");
-        }, 500);
+        navigateToEnd();
       };
 
       mediaRecorder.addEventListener("stop", handleStop, { once: true });
       stopRecording();
-    } else {
+
+      // Fallback: if stop event doesn't fire within 2 seconds, navigate anyway
       setTimeout(() => {
-        router.push("/end");
-      }, 500);
+        navigateToEnd();
+      }, 2000);
+    } else {
+      navigateToEnd();
     }
   }, [stopRecording, router]);
 
