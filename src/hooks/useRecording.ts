@@ -6,7 +6,7 @@ interface UseRecordingReturn {
   duration: number;
   mimeType: string;
   mediaRecorderRef: React.RefObject<MediaRecorder | null>;
-  startRecording: (stream: MediaStream) => void;
+  startRecording: (stream: MediaStream, preserveChunks?: boolean) => void;
   stopRecording: () => void;
   resetRecording: () => void;
 }
@@ -22,144 +22,160 @@ export const useRecording = (): UseRecordingReturn => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef<boolean>(true);
 
-  const startRecording = useCallback((stream: MediaStream) => {
-    chunksRef.current = [];
-    setRecordedChunks([]);
-    setDownloadUrl(null);
-    setDuration(0);
-    startTimeRef.current = Date.now();
-
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    // Start the timer interval
-    intervalRef.current = setInterval(() => {
-      if (isMountedRef.current && startTimeRef.current > 0) {
-        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-        setDuration(elapsed);
-      }
-    }, 1000);
-
-    try {
-      // Try different mimeTypes in order of preference
-      // Prioritize MP4/H.264 for maximum device compatibility
-      let mimeType = "";
-      const mimeTypes = [
-        // MP4 formats (best compatibility across all devices)
-        "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 Baseline + AAC
-        "video/mp4;codecs=avc1.4D001E,mp4a.40.2", // H.264 Main + AAC
-        "video/mp4;codecs=avc1.64001E,mp4a.40.2", // H.264 High + AAC
-        "video/mp4;codecs=h264,opus",
-        "video/mp4",
-        // WebM formats (good browser support, but limited device support)
-        "video/webm;codecs=vp9,opus",
-        "video/webm;codecs=vp8,opus",
-        "video/webm;codecs=h264,opus",
-        "video/webm",
-      ];
-
-      for (const type of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(type)) {
-          mimeType = type;
-          break;
+  const startRecording = useCallback(
+    (stream: MediaStream, preserveChunks = false) => {
+      // Only clear chunks if not preserving (i.e., starting fresh recording)
+      if (!preserveChunks) {
+        chunksRef.current = [];
+        setRecordedChunks([]);
+        setDownloadUrl(null);
+        setDuration(0);
+        startTimeRef.current = Date.now();
+      } else {
+        // If preserving chunks, only initialize startTime if not already set
+        if (startTimeRef.current === 0) {
+          startTimeRef.current = Date.now();
         }
       }
 
-      if (!mimeType) {
-        // Fallback to default WebM
-        mimeType = "video/webm";
+      // Clear any existing interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
 
-      const options: MediaRecorderOptions = {
-        mimeType,
-      };
+      // Start the timer interval (only if not already running)
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(() => {
+          if (isMountedRef.current && startTimeRef.current > 0) {
+            const elapsed = Math.floor(
+              (Date.now() - startTimeRef.current) / 1000
+            );
+            setDuration(elapsed);
+          }
+        }, 1000);
+      }
 
-      const mediaRecorder = new MediaRecorder(stream, options);
-      mediaRecorderRef.current = mediaRecorder;
+      try {
+        // Try different mimeTypes in order of preference
+        // Prioritize MP4/H.264 for maximum device compatibility
+        let mimeType = "";
+        const mimeTypes = [
+          // MP4 formats (best compatibility across all devices)
+          "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 Baseline + AAC
+          "video/mp4;codecs=avc1.4D001E,mp4a.40.2", // H.264 Main + AAC
+          "video/mp4;codecs=avc1.64001E,mp4a.40.2", // H.264 High + AAC
+          "video/mp4;codecs=h264,opus",
+          "video/mp4",
+          // WebM formats (good browser support, but limited device support)
+          "video/webm;codecs=vp9,opus",
+          "video/webm;codecs=vp8,opus",
+          "video/webm;codecs=h264,opus",
+          "video/webm",
+        ];
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          chunksRef.current.push(event.data);
-          setRecordedChunks((prev) => [...prev, event.data]);
+        for (const type of mimeTypes) {
+          if (MediaRecorder.isTypeSupported(type)) {
+            mimeType = type;
+            break;
+          }
         }
-      };
 
-      mediaRecorder.onstop = () => {
-        // Process immediately - onstop fires after all data is available
-        // Capture final duration
-        if (startTimeRef.current > 0) {
-          const finalDuration = Math.floor(
-            (Date.now() - startTimeRef.current) / 1000
-          );
-          setDuration(finalDuration);
+        if (!mimeType) {
+          // Fallback to default WebM
+          mimeType = "video/webm";
         }
 
-        if (chunksRef.current.length > 0) {
-          let finalMimeType = mediaRecorder.mimeType || mimeType || "video/mp4";
+        const options: MediaRecorderOptions = {
+          mimeType,
+        };
 
-          // Normalize mime type for better compatibility
-          if (
-            finalMimeType.includes("mp4") ||
-            finalMimeType.includes("avc1") ||
-            finalMimeType.includes("h264")
-          ) {
-            // Ensure MP4 mime type is correct
-            if (!finalMimeType.startsWith("video/mp4")) {
+        const mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            chunksRef.current.push(event.data);
+            setRecordedChunks((prev) => [...prev, event.data]);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          // Process immediately - onstop fires after all data is available
+          // Capture final duration
+          if (startTimeRef.current > 0) {
+            const finalDuration = Math.floor(
+              (Date.now() - startTimeRef.current) / 1000
+            );
+            setDuration(finalDuration);
+          }
+
+          if (chunksRef.current.length > 0) {
+            let finalMimeType =
+              mediaRecorder.mimeType || mimeType || "video/mp4";
+
+            // Normalize mime type for better compatibility
+            if (
+              finalMimeType.includes("mp4") ||
+              finalMimeType.includes("avc1") ||
+              finalMimeType.includes("h264")
+            ) {
+              // Ensure MP4 mime type is correct
+              if (!finalMimeType.startsWith("video/mp4")) {
+                finalMimeType = "video/mp4";
+              }
+            } else if (finalMimeType.includes("webm")) {
+              // Keep WebM as is
+              finalMimeType = finalMimeType;
+            } else {
+              // Default to MP4 for best compatibility
               finalMimeType = "video/mp4";
             }
-          } else if (finalMimeType.includes("webm")) {
-            // Keep WebM as is
-            finalMimeType = finalMimeType;
-          } else {
-            // Default to MP4 for best compatibility
-            finalMimeType = "video/mp4";
-          }
 
-          setMimeType(finalMimeType);
+            setMimeType(finalMimeType);
 
-          // Create blob with all collected chunks
-          const blob = new Blob(chunksRef.current, { type: finalMimeType });
+            // Create blob with all collected chunks
+            const blob = new Blob(chunksRef.current, { type: finalMimeType });
 
-          // Verify blob size is reasonable (at least 1KB)
-          if (blob.size > 1024) {
-            const url = URL.createObjectURL(blob);
-            setDownloadUrl(url);
-          } else {
-            if (process.env.NODE_ENV === "development") {
-              console.warn(
-                "Recording blob too small, may be incomplete:",
-                blob.size
-              );
+            // Verify blob size is reasonable (at least 1KB)
+            if (blob.size > 1024) {
+              const url = URL.createObjectURL(blob);
+              setDownloadUrl(url);
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.warn(
+                  "Recording blob too small, may be incomplete:",
+                  blob.size
+                );
+              }
+              // Still set it, but warn
+              const url = URL.createObjectURL(blob);
+              setDownloadUrl(url);
             }
-            // Still set it, but warn
-            const url = URL.createObjectURL(blob);
-            setDownloadUrl(url);
+          } else {
+            // If no chunks, still try to create a minimal blob or set error state
+            if (process.env.NODE_ENV === "development") {
+              console.warn("No recording chunks available");
+            }
           }
-        } else {
-          // If no chunks, still try to create a minimal blob or set error state
+        };
+
+        mediaRecorder.onerror = (event) => {
           if (process.env.NODE_ENV === "development") {
-            console.warn("No recording chunks available");
+            console.error("MediaRecorder error:", event);
           }
-        }
-      };
+        };
 
-      mediaRecorder.onerror = (event) => {
+        // Start with timeslice to ensure regular data chunks
+        mediaRecorder.start(1000);
+      } catch (error) {
         if (process.env.NODE_ENV === "development") {
-          console.error("MediaRecorder error:", event);
+          console.error("Failed to start recording:", error);
         }
-      };
-
-      // Start with timeslice to ensure regular data chunks
-      mediaRecorder.start(1000);
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Failed to start recording:", error);
       }
-    }
-  }, []);
+    },
+    []
+  );
 
   const stopRecording = useCallback(() => {
     // Capture final duration before clearing interval

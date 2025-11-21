@@ -52,7 +52,7 @@ interface StreamContextType {
   recordingDuration: number;
   recordingMimeType: string;
   mediaRecorderRef: React.RefObject<MediaRecorder | null>;
-  startRecording: (stream: MediaStream) => void;
+  startRecording: (stream: MediaStream, preserveChunks?: boolean) => void;
   stopRecording: () => void;
   resetRecording: () => void;
 }

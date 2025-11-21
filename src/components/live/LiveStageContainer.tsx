@@ -134,31 +134,64 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   const viewerCount = useViewerCount("live");
 
   useEffect(() => {
+    // Stop updating viewer count when stream has ended
+    if (showEndStage) return;
+
     const rafId = requestAnimationFrame(() => {
       onViewerCountChange(viewerCount);
     });
     return () => cancelAnimationFrame(rafId);
-  }, [viewerCount, onViewerCountChange]);
+  }, [viewerCount, onViewerCountChange, showEndStage]);
+
+  const previousQualityRef = useRef<VideoQuality>(quality);
+  const isQualityChangingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (currentStream && streamRef.current) {
-      // Only start recording if not already recording
       const recorder = mediaRecorderRef.current;
+      const qualityChanged = previousQualityRef.current !== quality;
+
+      if (qualityChanged && recorder && recorder.state === "recording") {
+        // Quality changed while recording - stop current segment and start new one
+        isQualityChangingRef.current = true;
+
+        const handleStop = () => {
+          // Wait a bit for all chunks to be collected, then start new recording
+          setTimeout(() => {
+            if (streamRef.current && !showEndStage) {
+              startRecording(streamRef.current, true);
+            }
+            isQualityChangingRef.current = false;
+          }, 100);
+        };
+
+        recorder.addEventListener("stop", handleStop, { once: true });
+        stopRecording();
+        previousQualityRef.current = quality;
+        return;
+      }
+
+      // Only start recording if not already recording
       if (!recorder || recorder.state === "inactive") {
         startRecording(streamRef.current);
+        previousQualityRef.current = quality;
       }
     }
     return () => {
-      // Stop recording on cleanup - capture ref value
+      // Only stop recording on cleanup if not changing quality
+      if (isQualityChangingRef.current) return;
+
       const recorder = mediaRecorderRef.current;
+      // Don't stop if quality is changing (handled in the effect body)
       if (
         recorder &&
-        (recorder.state === "recording" || recorder.state === "paused")
+        (recorder.state === "recording" || recorder.state === "paused") &&
+        previousQualityRef.current === quality
       ) {
         stopRecording();
       }
     };
-  }, [currentStream, startRecording, stopRecording]);
+  }, [currentStream, quality, startRecording, stopRecording, showEndStage]);
 
   const addComment = useCallback(
     (comment: Comment) => {
@@ -192,7 +225,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         reactionTimeoutsRef.current.push(timeout);
       }
     },
-    [contextAddReaction]
+    [contextAddReaction, lastReactionTimeRef]
   );
 
   useEffect(() => {
@@ -291,7 +324,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     } else {
       showEndStage();
     }
-  }, [stopRecording]);
+  }, [stopRecording, mediaRecorderRef, recognitionRef]);
 
   const removeReaction = useCallback(
     (id: number) => {
