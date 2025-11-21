@@ -5,7 +5,7 @@ import { LiveStageContainer } from "@/components/live/LiveStageContainer";
 import { useStreamContext } from "@/contexts/StreamContext";
 import { createComment } from "@/utils/helpers";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 
 function LivePageContent() {
   const router = useRouter();
@@ -94,7 +94,9 @@ function LivePageContent() {
 export default function LivePage() {
   return (
     <ErrorBoundary>
-      <LivePageContent />
+      <Suspense fallback={<div className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">Loading...</div>}>
+        <LivePageContent />
+      </Suspense>
     </ErrorBoundary>
   );
 }
