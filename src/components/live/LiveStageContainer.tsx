@@ -144,16 +144,30 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   }, [viewerCount, onViewerCountChange, showEndStage]);
 
   const previousQualityRef = useRef<VideoQuality>(quality);
-  const isQualityChangingRef = useRef<boolean>(false);
+  const previousVideoDeviceRef = useRef<string>(selectedVideoDeviceId);
+  const previousAudioDeviceRef = useRef<string>(selectedAudioDeviceId);
+  const previousOrientationRef = useRef<StreamOrientation>(orientation);
+  const isStreamChangingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (currentStream && streamRef.current) {
       const recorder = mediaRecorderRef.current;
       const qualityChanged = previousQualityRef.current !== quality;
+      const videoDeviceChanged =
+        previousVideoDeviceRef.current !== selectedVideoDeviceId;
+      const audioDeviceChanged =
+        previousAudioDeviceRef.current !== selectedAudioDeviceId;
+      const orientationChanged = previousOrientationRef.current !== orientation;
 
-      if (qualityChanged && recorder && recorder.state === "recording") {
-        // Quality changed while recording - stop current segment and start new one
-        isQualityChangingRef.current = true;
+      const streamChanged =
+        qualityChanged ||
+        videoDeviceChanged ||
+        audioDeviceChanged ||
+        orientationChanged;
+
+      if (streamChanged && recorder && recorder.state === "recording") {
+        // Stream changed while recording - stop current segment and start new one
+        isStreamChangingRef.current = true;
 
         const handleStop = () => {
           // Wait a bit for all chunks to be collected, then start new recording
@@ -161,37 +175,59 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
             if (streamRef.current && !showEndStage) {
               startRecording(streamRef.current, true);
             }
-            isQualityChangingRef.current = false;
+            isStreamChangingRef.current = false;
           }, 100);
         };
 
         recorder.addEventListener("stop", handleStop, { once: true });
         stopRecording();
+
+        // Update all previous refs
         previousQualityRef.current = quality;
+        previousVideoDeviceRef.current = selectedVideoDeviceId;
+        previousAudioDeviceRef.current = selectedAudioDeviceId;
+        previousOrientationRef.current = orientation;
         return;
       }
 
       // Only start recording if not already recording
       if (!recorder || recorder.state === "inactive") {
         startRecording(streamRef.current);
+
+        // Update all previous refs
         previousQualityRef.current = quality;
+        previousVideoDeviceRef.current = selectedVideoDeviceId;
+        previousAudioDeviceRef.current = selectedAudioDeviceId;
+        previousOrientationRef.current = orientation;
       }
     }
     return () => {
-      // Only stop recording on cleanup if not changing quality
-      if (isQualityChangingRef.current) return;
+      // Only stop recording on cleanup if not changing stream
+      if (isStreamChangingRef.current) return;
 
       const recorder = mediaRecorderRef.current;
-      // Don't stop if quality is changing (handled in the effect body)
+      // Don't stop if stream is changing (handled in the effect body)
       if (
         recorder &&
         (recorder.state === "recording" || recorder.state === "paused") &&
-        previousQualityRef.current === quality
+        previousQualityRef.current === quality &&
+        previousVideoDeviceRef.current === selectedVideoDeviceId &&
+        previousAudioDeviceRef.current === selectedAudioDeviceId &&
+        previousOrientationRef.current === orientation
       ) {
         stopRecording();
       }
     };
-  }, [currentStream, quality, startRecording, stopRecording, showEndStage]);
+  }, [
+    currentStream,
+    quality,
+    selectedVideoDeviceId,
+    selectedAudioDeviceId,
+    orientation,
+    startRecording,
+    stopRecording,
+    showEndStage,
+  ]);
 
   const addComment = useCallback(
     (comment: Comment) => {
