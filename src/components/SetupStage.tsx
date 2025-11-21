@@ -1,13 +1,6 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -17,22 +10,29 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  Settings,
-  Smartphone,
-  Monitor,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { VIDEO_FILTERS } from "@/constants";
+import { StreamOrientation } from "@/types";
+import {
   Mic,
   MicOff,
+  Monitor,
+  Settings,
+  Smartphone,
+  Sparkles,
   Video as VideoIcon,
   VideoOff,
-  Sparkles,
 } from "lucide-react";
-import { VideoFeed } from "./VideoFeed";
+import React from "react";
 import { DeviceSettings } from "./DeviceSettings";
-import { StreamOrientation } from "@/types";
-import { VIDEO_FILTERS } from "@/constants";
+import { VideoFeed } from "./VideoFeed";
 
-import { VideoQuality } from "@/types";
 import { Switch } from "@/components/ui/switch";
+import { VideoQuality } from "@/types";
 
 interface SetupStageProps {
   orientation: StreamOrientation;

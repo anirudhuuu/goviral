@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { EndStage } from "@/components/EndStage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useStreamContext } from "@/contexts/StreamContext";
-import { EndStage } from "@/components/EndStage";
+import { useRouter } from "next/navigation";
 
 function EndPageContent() {
   const router = useRouter();

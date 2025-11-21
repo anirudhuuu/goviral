@@ -1,13 +1,6 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -16,11 +9,27 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Eye, Settings, Pin, User, Heart, Mic, MicOff, Sparkles } from "lucide-react";
-import { CommentItem } from "./CommentItem";
-import { ChatInput } from "./ChatInput";
-import { DeviceSettings } from "./DeviceSettings";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Comment, VideoQuality } from "@/types";
+import {
+  Eye,
+  Heart,
+  Mic,
+  MicOff,
+  Pin,
+  Settings,
+  Sparkles,
+  User,
+} from "lucide-react";
+import React from "react";
+import { ChatInput } from "./ChatInput";
+import { CommentItem } from "./CommentItem";
+import { DeviceSettings } from "./DeviceSettings";
 
 interface LiveStageHorizontalProps {
   viewerCount: number;
@@ -221,7 +230,9 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                   >
                     <Sparkles
                       size={16}
-                      className={`mr-1.5 ${currentFilter !== 0 ? "text-red-400" : ""}`}
+                      className={`mr-1.5 ${
+                        currentFilter !== 0 ? "text-red-400" : ""
+                      }`}
                     />
                     <span className="text-xs font-medium">Filter</span>
                   </Button>

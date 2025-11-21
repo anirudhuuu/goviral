@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { StreamStage } from "@/types";
+import { useEffect } from "react";
 
 interface KeyboardShortcutsProps {
   stage: StreamStage;
@@ -20,7 +20,10 @@ export const useKeyboardShortcuts = ({
 }: KeyboardShortcutsProps) => {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
         return;
       }
 
@@ -60,6 +63,12 @@ export const useKeyboardShortcuts = ({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [stage, onToggleMute, onToggleVideo, onToggleFilter, onEndStream, onGoLive]);
+  }, [
+    stage,
+    onToggleMute,
+    onToggleVideo,
+    onToggleFilter,
+    onEndStream,
+    onGoLive,
+  ]);
 };
-

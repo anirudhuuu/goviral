@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface VideoFeedProps {
   stream: MediaStream | null;
@@ -28,4 +28,3 @@ export const VideoFeed = React.memo<VideoFeedProps>(
 );
 
 VideoFeed.displayName = "VideoFeed";
-

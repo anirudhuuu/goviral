@@ -1,8 +1,8 @@
 "use client";
 
+import { SetupStage } from "@/components/SetupStage";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 import { useMediaStream } from "@/hooks/useMediaStream";
-import { SetupStage } from "@/components/SetupStage";
 import { StreamOrientation, VideoQuality } from "@/types";
 
 interface SetupStageContainerProps {
@@ -89,4 +89,3 @@ export const SetupStageContainer: React.FC<SetupStageContainerProps> = ({
     />
   );
 };
-

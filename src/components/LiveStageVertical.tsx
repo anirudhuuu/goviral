@@ -1,14 +1,6 @@
-import React from "react";
-import { AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -17,11 +9,28 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Eye, Settings, Mic, MicOff, Sparkles, Heart, Pin, X } from "lucide-react";
-import { CommentItem } from "./CommentItem";
-import { ChatInput } from "./ChatInput";
-import { DeviceSettings } from "./DeviceSettings";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Comment, VideoQuality } from "@/types";
+import { AnimatePresence } from "framer-motion";
+import {
+  Eye,
+  Heart,
+  Mic,
+  MicOff,
+  Pin,
+  Settings,
+  Sparkles,
+  X,
+} from "lucide-react";
+import React from "react";
+import { ChatInput } from "./ChatInput";
+import { CommentItem } from "./CommentItem";
+import { DeviceSettings } from "./DeviceSettings";
 
 interface LiveStageVerticalProps {
   viewerCount: number;
@@ -111,55 +120,55 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
               <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
               LIVE
             </Badge>
-          <Badge
-            variant="outline"
+            <Badge
+              variant="outline"
               className="bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md border-white/20 flex items-center text-white pointer-events-auto"
-          >
-            <span className="text-xs font-mono font-bold tabular-nums">
-              {formatDuration(duration)}
-            </span>
-          </Badge>
+            >
+              <span className="text-xs font-mono font-bold tabular-nums">
+                {formatDuration(duration)}
+              </span>
+            </Badge>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto">
             <Sheet>
-          <TooltipProvider>
-            <Tooltip>
-                <SheetTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+              <TooltipProvider>
+                <Tooltip>
+                  <SheetTrigger asChild>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-8 w-8 bg-black/80 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-black/90 hover:border-white/30"
-                    >
-                      <Settings size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                </SheetTrigger>
+                      >
+                        <Settings size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                  </SheetTrigger>
                   <TooltipContent>
                     <p>Settings</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-                <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
-                  <SheetHeader className="p-6 border-b border-white/10">
-                    <SheetTitle className="text-white">
-                      Stream Settings
-                    </SheetTitle>
-                    <SheetDescription className="text-zinc-400">
-                      Configure your audio and video devices.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <DeviceSettings
-                    devices={devices}
-                    selectedVideoDeviceId={selectedVideoDeviceId}
-                    selectedAudioDeviceId={selectedAudioDeviceId}
-                    selectedQuality={selectedQuality}
-                    onVideoDeviceChange={onVideoDeviceChange}
-                    onAudioDeviceChange={onAudioDeviceChange}
-                    onQualityChange={onQualityChange}
-                  />
-                </SheetContent>
-              </Sheet>
+              <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
+                <SheetHeader className="p-6 border-b border-white/10">
+                  <SheetTitle className="text-white">
+                    Stream Settings
+                  </SheetTitle>
+                  <SheetDescription className="text-zinc-400">
+                    Configure your audio and video devices.
+                  </SheetDescription>
+                </SheetHeader>
+                <DeviceSettings
+                  devices={devices}
+                  selectedVideoDeviceId={selectedVideoDeviceId}
+                  selectedAudioDeviceId={selectedAudioDeviceId}
+                  selectedQuality={selectedQuality}
+                  onVideoDeviceChange={onVideoDeviceChange}
+                  onAudioDeviceChange={onAudioDeviceChange}
+                  onQualityChange={onQualityChange}
+                />
+              </SheetContent>
+            </Sheet>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -168,31 +177,33 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                     className="bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md border-white/20 flex items-center gap-1.5 cursor-default"
                   >
                     <Eye size={12} className="text-white/80" />
-                    <span className="text-xs font-bold text-white">{viewerCount}</span>
+                    <span className="text-xs font-bold text-white">
+                      {viewerCount}
+                    </span>
                   </Badge>
                 </TooltipTrigger>
-              <TooltipContent>
+                <TooltipContent>
                   <p>Live Viewers</p>
-              </TooltipContent>
-            </Tooltip>
+                </TooltipContent>
+              </Tooltip>
             </TooltipProvider>
             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={onEndStream}
-                  variant="ghost"
-                  size="icon"
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={onEndStream}
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 bg-red-600/90 backdrop-blur-md rounded-full border border-red-500/50 text-white hover:bg-red-600 hover:border-red-400"
-                >
-                  <X size={16} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>End Stream</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                  >
+                    <X size={16} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>End Stream</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>

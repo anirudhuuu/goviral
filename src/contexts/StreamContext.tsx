@@ -1,8 +1,15 @@
 "use client";
 
-import React, { createContext, useContext, useState, useRef, useCallback, ReactNode } from "react";
-import { StreamOrientation, Comment, Reaction, VideoQuality } from "@/types";
 import { useRecording } from "@/hooks/useRecording";
+import { Comment, Reaction, StreamOrientation, VideoQuality } from "@/types";
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 
 interface StreamContextType {
   orientation: StreamOrientation;
@@ -165,6 +172,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
     resetRecording,
   };
 
-  return <StreamContext.Provider value={value}>{children}</StreamContext.Provider>;
+  return (
+    <StreamContext.Provider value={value}>{children}</StreamContext.Provider>
+  );
 };
-

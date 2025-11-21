@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,8 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ThumbsUp, Download, Eye, MessageSquare, Clock } from "lucide-react";
 import { createDownloadLink } from "@/utils/helpers";
+import { Clock, Download, Eye, MessageSquare, ThumbsUp } from "lucide-react";
+import React from "react";
 
 interface EndStageProps {
   viewerCount: number;

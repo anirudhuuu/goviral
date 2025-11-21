@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { StreamOrientation, VideoQuality } from "@/types";
 import { QUALITY_PRESETS } from "@/components/StreamQualitySelector";
+import { StreamOrientation, VideoQuality } from "@/types";
+import { useEffect, useRef, useState } from "react";
 
 interface UseMediaStreamProps {
   orientation: StreamOrientation;

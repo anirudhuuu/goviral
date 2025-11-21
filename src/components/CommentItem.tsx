@@ -1,7 +1,3 @@
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Comment, StreamOrientation } from "@/types";
-import { PROFILE_COLORS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -9,7 +5,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { PROFILE_COLORS } from "@/constants";
+import { Comment, StreamOrientation } from "@/types";
+import { motion } from "framer-motion";
 import { Pin, PinOff } from "lucide-react";
+import React, { useMemo } from "react";
 
 interface CommentItemProps {
   comment: Comment;
@@ -49,7 +49,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         initial={{ opacity: 0, x: -20, scale: 0.95 }}
         animate={{ opacity: 1, x: 0, scale: 1 }}
         className={`flex items-start space-x-2 mb-3 max-w-[90%] group ${
-          comment.isPinned ? 'bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-lg p-2' : ''
+          comment.isPinned
+            ? "bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-lg p-2"
+            : ""
         }`}
       >
         <div
@@ -78,7 +80,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                   variant="ghost"
                   size="icon"
                   className="opacity-0 group-hover:opacity-100 h-6 w-6 shrink-0 bg-black/60 hover:bg-black/80"
-                  onClick={() => comment.isPinned ? onUnpin?.(comment.id) : onPin?.(comment.id)}
+                  onClick={() =>
+                    comment.isPinned
+                      ? onUnpin?.(comment.id)
+                      : onPin?.(comment.id)
+                  }
                 >
                   {comment.isPinned ? (
                     <PinOff size={12} className="text-blue-400" />
@@ -102,7 +108,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
       initial={{ opacity: 0, x: 10 }}
       animate={{ opacity: 1, x: 0 }}
       className={`flex items-start space-x-3 mb-3 p-2 hover:bg-white/5 rounded-lg transition-colors group ${
-        comment.isPinned ? 'bg-blue-500/10 border border-blue-500/20' : ''
+        comment.isPinned ? "bg-blue-500/10 border border-blue-500/20" : ""
       }`}
     >
       <div
@@ -134,7 +140,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 variant="ghost"
                 size="icon"
                 className="opacity-0 group-hover:opacity-100 h-6 w-6 shrink-0"
-                onClick={() => comment.isPinned ? onUnpin?.(comment.id) : onPin?.(comment.id)}
+                onClick={() =>
+                  comment.isPinned ? onUnpin?.(comment.id) : onPin?.(comment.id)
+                }
               >
                 {comment.isPinned ? (
                   <PinOff size={12} className="text-blue-400" />
@@ -152,4 +160,3 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     </motion.div>
   );
 };
-

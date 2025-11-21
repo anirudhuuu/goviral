@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { LiveStageHorizontal } from "@/components/LiveStageHorizontal";
+import { LiveStageVertical } from "@/components/LiveStageVertical";
+import { PracticeMode } from "@/components/PracticeMode";
+import { ReactionFloater } from "@/components/ReactionFloater";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,28 +13,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Award } from "lucide-react";
+import { VideoFeed } from "@/components/VideoFeed";
+import { COMMENT_CONFIG, REACTION_CONFIG, VIDEO_FILTERS } from "@/constants";
+import { useStreamContext } from "@/contexts/StreamContext";
+import { useAIComments } from "@/hooks/useAIComments";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 import { useMediaStream } from "@/hooks/useMediaStream";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import { useAIComments } from "@/hooks/useAIComments";
-import { useViewerCount } from "@/hooks/useViewerCount";
-import { useRecording } from "@/hooks/useRecording";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useSpeechAnalysis } from "@/hooks/useSpeechAnalysis";
-import { VideoFeed } from "@/components/VideoFeed";
-import { ReactionFloater } from "@/components/ReactionFloater";
-import { LiveStageVertical } from "@/components/LiveStageVertical";
-import { LiveStageHorizontal } from "@/components/LiveStageHorizontal";
-import { PracticeMode } from "@/components/PracticeMode";
-import { useStreamContext } from "@/contexts/StreamContext";
-import { StreamOrientation, Comment, Reaction, VideoQuality } from "@/types";
-import { VIDEO_FILTERS, REACTION_CONFIG, COMMENT_CONFIG } from "@/constants";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useViewerCount } from "@/hooks/useViewerCount";
+import { Comment, StreamOrientation, VideoQuality } from "@/types";
 import {
   createComment,
-  limitComments,
   getContainerClassName,
+  limitComments,
 } from "@/utils/helpers";
+import { AnimatePresence } from "framer-motion";
+import { Award } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface LiveStageContainerProps {
   orientation: StreamOrientation;
@@ -250,7 +249,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     const navigateToEnd = () => {
       if (hasNavigated) return; // Prevent multiple navigations
       hasNavigated = true;
-      
+
       if (navigationTimeout) {
         clearTimeout(navigationTimeout);
         navigationTimeout = null;
@@ -259,7 +258,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         clearTimeout(fallbackTimeout);
         fallbackTimeout = null;
       }
-      
+
       navigationTimeout = setTimeout(() => {
         router.push("/end");
       }, 500);

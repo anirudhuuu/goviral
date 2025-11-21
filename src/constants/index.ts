@@ -60,4 +60,3 @@ export const REACTION_CONFIG = {
   BURST_DELAY: 80,
   TRIGGER_DELAY: 500,
 } as const;
-

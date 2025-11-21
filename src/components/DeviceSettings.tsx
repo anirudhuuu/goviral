@@ -1,4 +1,3 @@
-import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -7,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import React from "react";
 import { StreamQualitySelector, VideoQuality } from "./StreamQualitySelector";
 
 interface DeviceSettingsProps {
@@ -64,8 +64,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
           <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
             {audioDevices.map((device) => (
               <SelectItem key={device.deviceId} value={device.deviceId}>
-                {device.label ||
-                  `Microphone ${device.deviceId.slice(0, 5)}...`}
+                {device.label || `Microphone ${device.deviceId.slice(0, 5)}...`}
               </SelectItem>
             ))}
           </SelectContent>
@@ -79,4 +78,3 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
     </div>
   );
 };
-

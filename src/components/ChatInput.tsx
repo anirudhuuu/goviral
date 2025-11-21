@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from "react";
-import EmojiPicker from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Smile, Send } from "lucide-react";
-import { StreamOrientation } from "@/types";
 import { COMMENT_CONFIG } from "@/constants";
+import { StreamOrientation } from "@/types";
+import EmojiPicker from "emoji-picker-react";
+import { Send, Smile } from "lucide-react";
+import React, { useEffect, useRef } from "react";
 
 interface ChatInputProps {
   messageInput: string;
@@ -59,8 +59,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const isVertical = orientation === "vertical";
-  const remainingChars = COMMENT_CONFIG.MAX_MESSAGE_LENGTH - messageInput.length;
-  const showCharCount = messageInput.length > COMMENT_CONFIG.MAX_MESSAGE_LENGTH * 0.8;
+  const remainingChars =
+    COMMENT_CONFIG.MAX_MESSAGE_LENGTH - messageInput.length;
+  const showCharCount =
+    messageInput.length > COMMENT_CONFIG.MAX_MESSAGE_LENGTH * 0.8;
 
   return (
     <div className="relative">
@@ -121,7 +123,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             aria-label="Chat message input"
             maxLength={COMMENT_CONFIG.MAX_MESSAGE_LENGTH}
             className={`bg-transparent border-none outline-none text-sm text-white flex-1 h-auto p-0 focus-visible:ring-0 ${
-              isVertical ? "placeholder:text-white/30" : "placeholder:text-zinc-500"
+              isVertical
+                ? "placeholder:text-white/30"
+                : "placeholder:text-zinc-500"
             }`}
           />
           <Button
@@ -209,4 +213,3 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     </div>
   );
 };
-

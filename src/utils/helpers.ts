@@ -11,14 +11,20 @@ export const createComment = (
   isSystem,
 });
 
-export const limitComments = (comments: Comment[], maxCount: number): Comment[] => {
+export const limitComments = (
+  comments: Comment[],
+  maxCount: number
+): Comment[] => {
   if (comments.length > maxCount) {
     return comments.slice(comments.length - maxCount);
   }
   return comments;
 };
 
-export const generateRandomViewerChange = (maxChange: number, variance: number): number => {
+export const generateRandomViewerChange = (
+  maxChange: number,
+  variance: number
+): number => {
   return Math.floor(Math.random() * maxChange) - variance;
 };
 
@@ -29,9 +35,10 @@ export const createDownloadLink = (url: string, filename: string): void => {
   a.click();
 };
 
-export const getContainerClassName = (orientation: "vertical" | "horizontal"): string => {
+export const getContainerClassName = (
+  orientation: "vertical" | "horizontal"
+): string => {
   return orientation === "vertical"
     ? "w-auto mx-auto lg:w-full lg:max-w-none h-full lg:h-screen max-w-[420px] lg:max-w-none max-h-[95vh] lg:max-h-none aspect-[9/16] lg:aspect-auto rounded-[2.5rem] lg:rounded-none"
     : "w-full h-full lg:w-full lg:h-screen max-w-[98vw] lg:max-w-none max-h-[96vh] lg:max-h-none aspect-video lg:aspect-auto rounded-lg lg:rounded-none";
 };
-

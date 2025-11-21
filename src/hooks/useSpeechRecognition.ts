@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
 import { SPEECH_CONFIG } from "@/constants";
 import { StreamStage } from "@/types";
+import { useEffect, useRef, useState } from "react";
 
 interface SpeechRecognitionResult {
   isFinal: boolean;

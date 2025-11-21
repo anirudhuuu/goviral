@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,44 +9,45 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { AnimatePresence } from "framer-motion";
 import { Award } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
-  StreamStage,
-  StreamOrientation,
+  COMMENT_CONFIG,
+  REACTION_CONFIG,
+  VIDEO_FILTERS,
+  VIEWER_COUNT_CONFIG,
+} from "@/constants";
+import {
   Comment,
   Reaction,
+  StreamOrientation,
+  StreamStage,
   VideoQuality,
 } from "@/types";
 import {
-  VIEWER_COUNT_CONFIG,
-  VIDEO_FILTERS,
-  REACTION_CONFIG,
-  COMMENT_CONFIG,
-} from "@/constants";
-import {
   createComment,
-  limitComments,
   getContainerClassName,
+  limitComments,
 } from "@/utils/helpers";
 
+import { useAIComments } from "@/hooks/useAIComments";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 import { useMediaStream } from "@/hooks/useMediaStream";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import { useAIComments } from "@/hooks/useAIComments";
-import { useViewerCount } from "@/hooks/useViewerCount";
 import { useRecording } from "@/hooks/useRecording";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useSpeechAnalysis } from "@/hooks/useSpeechAnalysis";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useViewerCount } from "@/hooks/useViewerCount";
 
-import { VideoFeed } from "./VideoFeed";
+import { EndStage } from "./EndStage";
+import { LiveStageHorizontal } from "./LiveStageHorizontal";
+import { LiveStageVertical } from "./LiveStageVertical";
+import { PracticeMode } from "./PracticeMode";
 import { ReactionFloater } from "./ReactionFloater";
 import { SetupStage } from "./SetupStage";
-import { LiveStageVertical } from "./LiveStageVertical";
-import { LiveStageHorizontal } from "./LiveStageHorizontal";
-import { EndStage } from "./EndStage";
-import { PracticeMode } from "./PracticeMode";
+import { VideoFeed } from "./VideoFeed";
 
 const App: React.FC = () => {
   const [stage, setStage] = useState<StreamStage>("setup");
@@ -281,9 +281,9 @@ const App: React.FC = () => {
   return (
     <div
       className={`min-h-screen bg-[#09090b] font-sans text-white overflow-hidden ${
-      isSetupStage 
-        ? "w-full h-screen" 
-        : "flex items-center justify-center p-4 lg:p-0 lg:h-screen"
+        isSetupStage
+          ? "w-full h-screen"
+          : "flex items-center justify-center p-4 lg:p-0 lg:h-screen"
       }`}
     >
       {isSetupStage ? (
@@ -315,37 +315,72 @@ const App: React.FC = () => {
           />
         )
       ) : (
-      <div
-        className={`relative bg-black overflow-hidden transition-all duration-500 flex shadow-2xl lg:shadow-none ring-1 ring-white/10 lg:ring-0 ${containerClass}`}
-      >
-        {stage === "live" && (
-          <div
-            className={`relative w-full h-full bg-zinc-900 ${
-              orientation === "horizontal" ? "flex" : ""
-            }`}
-          >
+        <div
+          className={`relative bg-black overflow-hidden transition-all duration-500 flex shadow-2xl lg:shadow-none ring-1 ring-white/10 lg:ring-0 ${containerClass}`}
+        >
+          {stage === "live" && (
             <div
-              className={`relative overflow-hidden ${
+              className={`relative w-full h-full bg-zinc-900 ${
+                orientation === "horizontal" ? "flex" : ""
+              }`}
+            >
+              <div
+                className={`relative overflow-hidden ${
                   orientation === "horizontal"
                     ? "flex-1 h-full"
                     : "w-full h-full"
-              }`}
-            >
-              <VideoFeed
-                stream={currentStream}
-                filterClass={VIDEO_FILTERS[currentFilter].class}
-              />
+                }`}
+              >
+                <VideoFeed
+                  stream={currentStream}
+                  filterClass={VIDEO_FILTERS[currentFilter].class}
+                />
 
-              {orientation === "vertical" && (
-                <>
+                {orientation === "vertical" && (
+                  <>
                     <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
                     <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
-                </>
+                  </>
+                )}
+              </div>
+
+              {orientation === "horizontal" && (
+                <LiveStageHorizontal
+                  viewerCount={viewerCountState}
+                  duration={duration}
+                  streamTopic={streamTopic}
+                  comments={comments}
+                  messageInput={messageInput}
+                  showEmojiPicker={showEmojiPicker}
+                  isMuted={isMuted}
+                  currentFilter={currentFilter}
+                  devices={devices}
+                  selectedVideoDeviceId={selectedVideoDeviceId}
+                  selectedAudioDeviceId={selectedAudioDeviceId}
+                  selectedQuality={quality}
+                  chatContainerRef={chatContainerRef}
+                  onEndStream={handleEndStreamClick}
+                  onMessageChange={setMessageInput}
+                  onSendMessage={handleSendMessage}
+                  onToggleEmojiPicker={() =>
+                    setShowEmojiPicker(!showEmojiPicker)
+                  }
+                  onEmojiSelect={handleEmojiSelect}
+                  onToggleMute={() => setIsMuted(!isMuted)}
+                  onToggleFilter={toggleFilter}
+                  onTriggerReaction={triggerBurst}
+                  onVideoDeviceChange={setSelectedVideoDeviceId}
+                  onAudioDeviceChange={setSelectedAudioDeviceId}
+                  onQualityChange={setQuality}
+                  onPinComment={handlePinComment}
+                  onUnpinComment={handleUnpinComment}
+                />
               )}
             </div>
+          )}
 
-            {orientation === "horizontal" && (
-            <LiveStageHorizontal
+          {stage === "live" && orientation === "vertical" && (
+            <LiveStageVertical
               viewerCount={viewerCountState}
               duration={duration}
               streamTopic={streamTopic}
@@ -362,9 +397,7 @@ const App: React.FC = () => {
               onEndStream={handleEndStreamClick}
               onMessageChange={setMessageInput}
               onSendMessage={handleSendMessage}
-                  onToggleEmojiPicker={() =>
-                    setShowEmojiPicker(!showEmojiPicker)
-                  }
+              onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
               onEmojiSelect={handleEmojiSelect}
               onToggleMute={() => setIsMuted(!isMuted)}
               onToggleFilter={toggleFilter}
@@ -375,113 +408,82 @@ const App: React.FC = () => {
               onPinComment={handlePinComment}
               onUnpinComment={handleUnpinComment}
             />
-            )}
-          </div>
-        )}
+          )}
 
-        {stage === "live" && orientation === "vertical" && (
-          <LiveStageVertical
-            viewerCount={viewerCountState}
-            duration={duration}
-            streamTopic={streamTopic}
-            comments={comments}
-            messageInput={messageInput}
-            showEmojiPicker={showEmojiPicker}
-            isMuted={isMuted}
-            currentFilter={currentFilter}
-            devices={devices}
-            selectedVideoDeviceId={selectedVideoDeviceId}
-            selectedAudioDeviceId={selectedAudioDeviceId}
-            selectedQuality={quality}
-            chatContainerRef={chatContainerRef}
-            onEndStream={handleEndStreamClick}
-            onMessageChange={setMessageInput}
-            onSendMessage={handleSendMessage}
-            onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
-            onEmojiSelect={handleEmojiSelect}
-            onToggleMute={() => setIsMuted(!isMuted)}
-            onToggleFilter={toggleFilter}
-            onTriggerReaction={triggerBurst}
-            onVideoDeviceChange={setSelectedVideoDeviceId}
-            onAudioDeviceChange={setSelectedAudioDeviceId}
-            onQualityChange={setQuality}
-            onPinComment={handlePinComment}
-            onUnpinComment={handleUnpinComment}
-          />
-        )}
-
-        {stage === "live" && isPracticeMode && (
-          <PracticeMode
-            wordsPerMinute={speechMetrics.wordsPerMinute}
-            fillerWordsCount={speechMetrics.fillerWordsCount}
-            totalWords={speechMetrics.totalWords}
-            confidenceScore={speechMetrics.confidenceScore}
-            isVisible={showPracticeStats}
-            onClose={() => setShowPracticeStats(false)}
-          />
-        )}
-
-        {stage === "live" && isPracticeMode && !showPracticeStats && (
-          <Button
-            onClick={() => setShowPracticeStats(true)}
-              className="fixed bottom-4 right-4 z-[100] bg-red-600 hover:bg-red-700"
-            size="sm"
-          >
-            <Award size={16} className="mr-2" />
-            Show Stats
-          </Button>
-        )}
-
-        <AnimatePresence>
-          {reactions.map((reaction) => (
-            <ReactionFloater
-              key={reaction.id}
-              id={reaction.id}
-              type={reaction.type}
-              orientation={orientation}
-              onComplete={removeReaction}
+          {stage === "live" && isPracticeMode && (
+            <PracticeMode
+              wordsPerMinute={speechMetrics.wordsPerMinute}
+              fillerWordsCount={speechMetrics.fillerWordsCount}
+              totalWords={speechMetrics.totalWords}
+              confidenceScore={speechMetrics.confidenceScore}
+              isVisible={showPracticeStats}
+              onClose={() => setShowPracticeStats(false)}
             />
-          ))}
-        </AnimatePresence>
+          )}
 
-        <Dialog open={showEndConfirm} onOpenChange={setShowEndConfirm}>
-          <DialogContent className="bg-[#18181b] border-white/10 text-white max-w-xs">
-            <DialogHeader>
-              <DialogTitle>End Stream?</DialogTitle>
-              <DialogDescription className="text-zinc-400">
-                The broadcast will stop immediately and a recording will be
-                saved.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex-row gap-3">
-              <Button
-                onClick={() => setShowEndConfirm(false)}
-                variant="outline"
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={confirmEndStream}
-                variant="destructive"
-                className="flex-1 bg-red-600 hover:bg-red-700"
-              >
-                End Now
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          {stage === "live" && isPracticeMode && !showPracticeStats && (
+            <Button
+              onClick={() => setShowPracticeStats(true)}
+              className="fixed bottom-4 right-4 z-[100] bg-red-600 hover:bg-red-700"
+              size="sm"
+            >
+              <Award size={16} className="mr-2" />
+              Show Stats
+            </Button>
+          )}
 
-        {stage === "end" && (
-          <EndStage
-            viewerCount={viewerCountState}
-            commentCount={comments.length}
-            duration={duration}
-            downloadUrl={downloadUrl}
-            onReturnToStudio={handleReturnToStudio}
-          />
-        )}
-      </div>
+          <AnimatePresence>
+            {reactions.map((reaction) => (
+              <ReactionFloater
+                key={reaction.id}
+                id={reaction.id}
+                type={reaction.type}
+                orientation={orientation}
+                onComplete={removeReaction}
+              />
+            ))}
+          </AnimatePresence>
+
+          <Dialog open={showEndConfirm} onOpenChange={setShowEndConfirm}>
+            <DialogContent className="bg-[#18181b] border-white/10 text-white max-w-xs">
+              <DialogHeader>
+                <DialogTitle>End Stream?</DialogTitle>
+                <DialogDescription className="text-zinc-400">
+                  The broadcast will stop immediately and a recording will be
+                  saved.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex-row gap-3">
+                <Button
+                  onClick={() => setShowEndConfirm(false)}
+                  variant="outline"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmEndStream}
+                  variant="destructive"
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                >
+                  End Now
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {stage === "end" && (
+            <EndStage
+              viewerCount={viewerCountState}
+              commentCount={comments.length}
+              duration={duration}
+              downloadUrl={downloadUrl}
+              streamTopic={streamTopic}
+              streamerName={streamerName}
+              onReturnToStudio={handleReturnToStudio}
+            />
+          )}
+        </div>
       )}
     </div>
   );

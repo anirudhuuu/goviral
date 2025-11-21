@@ -1,7 +1,7 @@
+import { StreamProvider } from "@/contexts/StreamContext";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { StreamProvider } from "@/contexts/StreamContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GoViral - Practice & Stream Live",
-  description: "Practice your streaming skills with AI-powered feedback and go live with confidence. Perfect for new creators.",
+  description:
+    "Practice your streaming skills with AI-powered feedback and go live with confidence. Perfect for new creators.",
 };
 
 export default function RootLayout({
@@ -28,9 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StreamProvider>
-          {children}
-        </StreamProvider>
+        <StreamProvider>{children}</StreamProvider>
       </body>
     </html>
   );

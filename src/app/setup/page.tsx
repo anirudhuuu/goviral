@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { useStreamContext } from "@/contexts/StreamContext";
 import { SetupStageContainer } from "@/components/setup/SetupStageContainer";
+import { useStreamContext } from "@/contexts/StreamContext";
+import { useRouter } from "next/navigation";
 
 function SetupPageContent() {
   const router = useRouter();
@@ -51,7 +50,7 @@ function SetupPageContent() {
         onStreamerNameChange={setStreamerName}
         onToggleMute={() => setIsMuted(!isMuted)}
         onToggleVideo={() => setIsVideoEnabled(!isVideoEnabled)}
-        onToggleFilter={() => setCurrentFilter((prev) => (prev + 1) % 3)}
+        onToggleFilter={() => setCurrentFilter((currentFilter + 1) % 3)}
         onGoLive={handleGoLive}
         onQualityChange={setQuality}
         onPracticeModeChange={setIsPracticeMode}
@@ -67,4 +66,3 @@ export default function SetupPage() {
     </ErrorBoundary>
   );
 }
-

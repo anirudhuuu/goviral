@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
 import { EMOJI_REACTIONS } from "@/constants";
 import { StreamOrientation } from "@/types";
+import { motion } from "framer-motion";
+import React, { useMemo } from "react";
 
 interface ReactionFloaterProps {
   type: string;
@@ -43,4 +43,3 @@ export const ReactionFloater: React.FC<ReactionFloaterProps> = ({
     </motion.div>
   );
 };
-

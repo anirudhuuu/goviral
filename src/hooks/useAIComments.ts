@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { COMMENT_CONFIG, SPEECH_CONFIG } from "@/constants";
 import { aiService } from "@/services/aiService";
 import { Comment, StreamStage } from "@/types";
-import { SPEECH_CONFIG, COMMENT_CONFIG } from "@/constants";
 import { createComment } from "@/utils/helpers";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseAICommentsProps {
   stage: StreamStage;

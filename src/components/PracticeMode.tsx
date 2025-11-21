@@ -1,9 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MessageSquare, Zap, Award, X, GripVertical } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  Award,
+  GripVertical,
+  MessageSquare,
+  TrendingUp,
+  X,
+  Zap,
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface PracticeModeProps {
   wordsPerMinute: number;
@@ -35,7 +42,7 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
   }, [isVisible]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) return;
+    if ((e.target as HTMLElement).closest("button")) return;
     setIsDragging(true);
     if (cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
@@ -60,11 +67,11 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
     };
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
       };
     }
   }, [isDragging, dragOffset]);
@@ -109,7 +116,9 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs text-zinc-400">Confidence Score</span>
-            <span className={`text-lg font-bold ${getScoreColor(confidenceScore)}`}>
+            <span
+              className={`text-lg font-bold ${getScoreColor(confidenceScore)}`}
+            >
               {confidenceScore}%
             </span>
           </div>
@@ -124,7 +133,10 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold">{wordsPerMinute}</span>
-              <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-zinc-700">
+              <Badge
+                variant="outline"
+                className="text-[10px] py-0 px-1.5 border-zinc-700"
+              >
                 {getWPMFeedback(wordsPerMinute)}
               </Badge>
             </div>
@@ -143,7 +155,11 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
               <Zap size={14} className="text-zinc-400" />
               <span className="text-xs text-zinc-400">Filler Words</span>
             </div>
-            <span className={`text-sm font-semibold ${fillerWordsCount > 5 ? 'text-red-400' : 'text-green-400'}`}>
+            <span
+              className={`text-sm font-semibold ${
+                fillerWordsCount > 5 ? "text-red-400" : "text-green-400"
+              }`}
+            >
               {fillerWordsCount}
             </span>
           </div>
@@ -151,11 +167,11 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({
 
         {fillerWordsCount > 5 && (
           <div className="text-[10px] text-zinc-500 bg-zinc-900/50 p-2 rounded">
-            💡 Tip: Reduce "um", "uh", "like" usage
+            💡 Tip: Reduce &quot;um&quot;, &quot;uh&quot;, &quot;like&quot;
+            usage
           </div>
         )}
       </CardContent>
     </Card>
   );
 };
-

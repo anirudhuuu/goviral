@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { useStreamContext } from "@/contexts/StreamContext";
 import { LiveStageContainer } from "@/components/live/LiveStageContainer";
+import { useStreamContext } from "@/contexts/StreamContext";
 import { createComment } from "@/utils/helpers";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 function LivePageContent() {
   const router = useRouter();
@@ -74,7 +74,7 @@ function LivePageContent() {
         onMessageChange={setMessageInput}
         onSendMessage={handleSendMessage}
         onToggleEmojiPicker={() => setShowEmojiPicker(!showEmojiPicker)}
-        onEmojiSelect={(emoji: string) => setMessageInput((prev) => prev + emoji)}
+        onEmojiSelect={(emoji: string) => setMessageInput(messageInput + emoji)}
         onToggleMute={() => setIsMuted(!isMuted)}
         onToggleFilter={toggleFilter}
         onTriggerReaction={(type: string) => {
@@ -98,4 +98,3 @@ export default function LivePage() {
     </ErrorBoundary>
   );
 }
-

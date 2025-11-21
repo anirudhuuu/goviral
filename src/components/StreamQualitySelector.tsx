@@ -1,4 +1,3 @@
-import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -7,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import React from "react";
 
 export type VideoQuality = "360p" | "720p" | "1080p";
 
@@ -34,7 +34,10 @@ export const StreamQualitySelector: React.FC<StreamQualitySelectorProps> = ({
   return (
     <div className="space-y-2">
       <Label className="text-zinc-400">Stream Quality</Label>
-      <Select value={selectedQuality} onValueChange={(v) => onQualityChange(v as VideoQuality)}>
+      <Select
+        value={selectedQuality}
+        onValueChange={(v) => onQualityChange(v as VideoQuality)}
+      >
         <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
           <SelectValue />
         </SelectTrigger>
@@ -47,4 +50,3 @@ export const StreamQualitySelector: React.FC<StreamQualitySelectorProps> = ({
     </div>
   );
 };
-
