@@ -15,6 +15,9 @@ interface EndStageProps {
   commentCount: number;
   duration: number;
   downloadUrl: string | null;
+  mimeType?: string;
+  streamTopic: string;
+  streamerName: string;
   onReturnToStudio: () => void;
 }
 
@@ -23,22 +26,66 @@ export const EndStage: React.FC<EndStageProps> = ({
   commentCount,
   duration,
   downloadUrl,
+  mimeType = "video/mp4",
+  streamTopic,
+  streamerName,
   onReturnToStudio,
 }) => {
   const formatDuration = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hrs > 0) {
-      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      return `${hrs}:${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
     }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  const getFileExtension = (mime: string): string => {
+    // Prioritize MP4 for best device compatibility
+    if (mime.includes("mp4")) return "mp4";
+    if (mime.includes("webm")) return "webm";
+    if (mime.includes("h264") || mime.includes("avc1")) return "mp4";
+    if (mime.includes("ogg")) return "ogg";
+    if (mime.includes("mov")) return "mov";
+    // Default to MP4 if we can't determine (better compatibility than webm)
+    return "mp4";
+  };
+
+  const sanitizeFilename = (name: string): string => {
+    // Remove or replace special characters that aren't safe for filenames
+    return name
+      .replace(/[<>:"/\\|?*]/g, "") // Remove invalid filename characters
+      .replace(/\s+/g, "_") // Replace spaces with underscores
+      .replace(/_{2,}/g, "_") // Replace multiple underscores with single
+      .replace(/^_+|_+$/g, "") // Remove leading/trailing underscores
+      .substring(0, 100); // Limit length
+  };
+
+  const formatTimestamp = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  };
+
   const handleDownload = () => {
     if (downloadUrl) {
-      const extension = downloadUrl.includes('webm') ? 'webm' : 'mp4';
-      createDownloadLink(downloadUrl, `stream-recording-${Date.now()}.${extension}`);
+      const extension = getFileExtension(mimeType);
+      const sanitizedTopic = sanitizeFilename(streamTopic || "Stream");
+      const sanitizedStreamer = sanitizeFilename(streamerName || "User");
+      const timestamp = formatTimestamp();
+
+      const filename = `${sanitizedTopic}_${sanitizedStreamer}_${timestamp}.${extension}`;
+      createDownloadLink(downloadUrl, filename);
     }
   };
 
@@ -68,8 +115,8 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <Eye size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-2xl font-bold text-white tabular-nums">
-                {viewerCount + 53}
-              </div>
+                  {viewerCount + 53}
+                </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
                   Views
                 </div>
@@ -81,10 +128,10 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <MessageSquare size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-2xl font-bold text-white tabular-nums">
-                {commentCount}
-              </div>
+                  {commentCount}
+                </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-                Messages
+                  Messages
                 </div>
               </div>
             </div>
@@ -94,10 +141,10 @@ export const EndStage: React.FC<EndStageProps> = ({
                   <Clock size={18} className="text-zinc-300" />
                 </div>
                 <div className="text-xl font-bold font-mono text-white tabular-nums">
-                {formatDuration(duration)}
-              </div>
+                  {formatDuration(duration)}
+                </div>
                 <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-                Duration
+                  Duration
                 </div>
               </div>
             </div>
@@ -133,4 +180,3 @@ export const EndStage: React.FC<EndStageProps> = ({
     </div>
   );
 };
-

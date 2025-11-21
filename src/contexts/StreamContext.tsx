@@ -42,6 +42,7 @@ interface StreamContextType {
   unpinComment: (commentId: number) => void;
   downloadUrl: string | null;
   recordingDuration: number;
+  recordingMimeType: string;
   mediaRecorderRef: React.RefObject<MediaRecorder | null>;
   startRecording: (stream: MediaStream) => void;
   stopRecording: () => void;
@@ -84,6 +85,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
   const {
     downloadUrl,
     duration: recordingDuration,
+    mimeType: recordingMimeType,
     mediaRecorderRef,
     startRecording,
     stopRecording,
@@ -156,6 +158,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
     unpinComment,
     downloadUrl,
     recordingDuration,
+    recordingMimeType,
     mediaRecorderRef,
     startRecording,
     stopRecording,

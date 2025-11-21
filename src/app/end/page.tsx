@@ -7,7 +7,15 @@ import { EndStage } from "@/components/EndStage";
 
 function EndPageContent() {
   const router = useRouter();
-  const { viewerCountState, comments, downloadUrl, recordingDuration } = useStreamContext();
+  const {
+    viewerCountState,
+    comments,
+    downloadUrl,
+    recordingDuration,
+    recordingMimeType,
+    streamTopic,
+    streamerName,
+  } = useStreamContext();
 
   const handleReturnToStudio = () => {
     router.push("/setup");
@@ -20,6 +28,9 @@ function EndPageContent() {
         commentCount={comments.length}
         duration={recordingDuration}
         downloadUrl={downloadUrl}
+        mimeType={recordingMimeType}
+        streamTopic={streamTopic}
+        streamerName={streamerName}
         onReturnToStudio={handleReturnToStudio}
       />
     </div>
@@ -33,4 +44,3 @@ export default function EndPage() {
     </ErrorBoundary>
   );
 }
-

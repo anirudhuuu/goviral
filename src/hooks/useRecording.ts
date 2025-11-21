@@ -4,6 +4,7 @@ interface UseRecordingReturn {
   recordedChunks: Blob[];
   downloadUrl: string | null;
   duration: number;
+  mimeType: string;
   mediaRecorderRef: React.RefObject<MediaRecorder | null>;
   startRecording: (stream: MediaStream) => void;
   stopRecording: () => void;
@@ -14,6 +15,7 @@ export const useRecording = (): UseRecordingReturn => {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [duration, setDuration] = useState<number>(0);
+  const [mimeType, setMimeType] = useState<string>("video/mp4");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const startTimeRef = useRef<number>(0);
@@ -36,13 +38,38 @@ export const useRecording = (): UseRecordingReturn => {
     }, 1000);
 
     try {
-      const options: MediaRecorderOptions = {
-        mimeType: "video/webm;codecs=vp8,opus",
-      };
+      // Try different mimeTypes in order of preference
+      // Prioritize MP4/H.264 for maximum device compatibility
+      let mimeType = "";
+      const mimeTypes = [
+        // MP4 formats (best compatibility across all devices)
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 Baseline + AAC
+        "video/mp4;codecs=avc1.4D001E,mp4a.40.2", // H.264 Main + AAC
+        "video/mp4;codecs=avc1.64001E,mp4a.40.2", // H.264 High + AAC
+        "video/mp4;codecs=h264,opus",
+        "video/mp4",
+        // WebM formats (good browser support, but limited device support)
+        "video/webm;codecs=vp9,opus",
+        "video/webm;codecs=vp8,opus",
+        "video/webm;codecs=h264,opus",
+        "video/webm",
+      ];
 
-      if (!MediaRecorder.isTypeSupported(options.mimeType || "")) {
-        options.mimeType = "video/webm";
+      for (const type of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
       }
+
+      if (!mimeType) {
+        // Fallback to default WebM
+        mimeType = "video/webm";
+      }
+
+      const options: MediaRecorderOptions = {
+        mimeType,
+      };
 
       const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
@@ -55,12 +82,44 @@ export const useRecording = (): UseRecordingReturn => {
       };
 
       mediaRecorder.onstop = () => {
-        if (chunksRef.current.length > 0) {
-          const mimeType = mediaRecorder.mimeType || "video/webm";
-          const blob = new Blob(chunksRef.current, { type: mimeType });
-          const url = URL.createObjectURL(blob);
-          setDownloadUrl(url);
-        }
+        // Wait a bit to ensure all data chunks are collected
+        setTimeout(() => {
+          if (chunksRef.current.length > 0) {
+            let finalMimeType = mediaRecorder.mimeType || mimeType || "video/mp4";
+            
+            // Normalize mime type for better compatibility
+            if (finalMimeType.includes("mp4") || finalMimeType.includes("avc1") || finalMimeType.includes("h264")) {
+              // Ensure MP4 mime type is correct
+              if (!finalMimeType.startsWith("video/mp4")) {
+                finalMimeType = "video/mp4";
+              }
+            } else if (finalMimeType.includes("webm")) {
+              // Keep WebM as is
+              finalMimeType = finalMimeType;
+            } else {
+              // Default to MP4 for best compatibility
+              finalMimeType = "video/mp4";
+            }
+            
+            setMimeType(finalMimeType);
+            
+            // Create blob with all collected chunks
+            const blob = new Blob(chunksRef.current, { type: finalMimeType });
+            
+            // Verify blob size is reasonable (at least 1KB)
+            if (blob.size > 1024) {
+              const url = URL.createObjectURL(blob);
+              setDownloadUrl(url);
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.warn("Recording blob too small, may be incomplete:", blob.size);
+              }
+              // Still set it, but warn
+              const url = URL.createObjectURL(blob);
+              setDownloadUrl(url);
+            }
+          }
+        }, 100);
       };
 
       mediaRecorder.onerror = (event) => {
@@ -69,6 +128,7 @@ export const useRecording = (): UseRecordingReturn => {
         }
       };
 
+      // Start with timeslice to ensure regular data chunks
       mediaRecorder.start(1000);
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
@@ -87,7 +147,30 @@ export const useRecording = (): UseRecordingReturn => {
       mediaRecorderRef.current &&
       mediaRecorderRef.current.state !== "inactive"
     ) {
-      mediaRecorderRef.current.stop();
+      const recorder = mediaRecorderRef.current;
+      
+      // Request final data chunk before stopping to ensure all data is captured
+      if (recorder.state === "recording") {
+        try {
+          recorder.requestData();
+        } catch (e) {
+          // Some browsers may not support requestData in all states
+          if (process.env.NODE_ENV === "development") {
+            console.warn("Could not request data:", e);
+          }
+        }
+      }
+      
+      // Stop the recorder - onstop will handle blob creation
+      try {
+        if (recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error stopping recorder:", e);
+        }
+      }
     }
   }, []);
 
@@ -103,6 +186,7 @@ export const useRecording = (): UseRecordingReturn => {
     }
     setDownloadUrl(null);
     setDuration(0);
+    setMimeType("video/mp4");
   }, [downloadUrl]);
 
   useEffect(() => {
@@ -117,6 +201,7 @@ export const useRecording = (): UseRecordingReturn => {
     recordedChunks,
     downloadUrl,
     duration,
+    mimeType,
     mediaRecorderRef,
     startRecording,
     stopRecording,
