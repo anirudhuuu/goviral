@@ -95,7 +95,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     setComments,
     setReactions,
     reactions,
-    addComment: contextAddComment,
     addReaction: contextAddReaction,
     lastReactionTimeRef,
     downloadUrl,
@@ -227,9 +226,14 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   const handleSendMessage = useCallback(() => {
     if (!messageInput.trim()) return;
-    addComment(createComment("You", messageInput, false));
+    setComments((prev) =>
+      limitComments(
+        [...prev, createComment("You", messageInput, false)],
+        COMMENT_CONFIG.MAX_COMMENTS
+      )
+    );
     onMessageChange("");
-  }, [messageInput, addComment, onMessageChange]);
+  }, [messageInput, setComments, onMessageChange]);
 
   const handleEndStreamClick = useCallback(() => {
     setShowEndConfirm(true);

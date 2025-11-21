@@ -77,9 +77,7 @@ function LivePageContent() {
         onEmojiSelect={(emoji: string) => setMessageInput(messageInput + emoji)}
         onToggleMute={() => setIsMuted(!isMuted)}
         onToggleFilter={toggleFilter}
-        onTriggerReaction={(type: string) => {
-          // Handled in LiveStageContainer
-        }}
+        onTriggerReaction={() => {}}
         onQualityChange={setQuality}
         onPracticeModeChange={setIsPracticeMode}
         onShowPracticeStatsChange={setShowPracticeStats}
@@ -94,7 +92,13 @@ function LivePageContent() {
 export default function LivePage() {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">
+            Loading...
+          </div>
+        }
+      >
         <LivePageContent />
       </Suspense>
     </ErrorBoundary>
