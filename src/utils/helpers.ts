@@ -31,7 +31,7 @@ export const createDownloadLink = (url: string, filename: string): void => {
 
 export const getContainerClassName = (orientation: "vertical" | "horizontal"): string => {
   return orientation === "vertical"
-    ? "w-full lg:w-full lg:max-w-none h-full lg:h-screen max-w-[420px] lg:max-w-none max-h-[95vh] lg:max-h-none aspect-[9/16] lg:aspect-auto rounded-[2.5rem] lg:rounded-none"
+    ? "w-auto mx-auto lg:w-full lg:max-w-none h-full lg:h-screen max-w-[420px] lg:max-w-none max-h-[95vh] lg:max-h-none aspect-[9/16] lg:aspect-auto rounded-[2.5rem] lg:rounded-none"
     : "w-full h-full lg:w-full lg:h-screen max-w-[98vw] lg:max-w-none max-h-[96vh] lg:max-h-none aspect-video lg:aspect-auto rounded-lg lg:rounded-none";
 };
 
