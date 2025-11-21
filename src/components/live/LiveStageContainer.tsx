@@ -31,8 +31,8 @@ import {
 } from "@/utils/helpers";
 import { AnimatePresence } from "framer-motion";
 import { Award } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EndStage } from "@/components/EndStage";
 
 interface LiveStageContainerProps {
   orientation: StreamOrientation;
@@ -91,7 +91,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   onPinComment,
   onUnpinComment,
 }) => {
-  const router = useRouter();
   const {
     setComments,
     setReactions,
@@ -101,14 +100,16 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     lastReactionTimeRef,
     downloadUrl,
     recordingDuration,
+    recordingMimeType,
     mediaRecorderRef,
     startRecording,
     stopRecording,
     resetRecording,
+    streamerName,
   } = useStreamContext();
 
   const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const [duration, setDuration] = useState(recordingDuration);
+  const [showEndStage, setShowEndStage] = useState(false);
 
   const {
     devices,
@@ -159,10 +160,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
       }
     };
   }, [currentStream, startRecording, stopRecording]);
-
-  useEffect(() => {
-    setDuration(recordingDuration);
-  }, [recordingDuration]);
 
   const addComment = useCallback(
     (comment: Comment) => {
@@ -240,27 +237,29 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   const confirmEndStream = useCallback(() => {
     recognitionRef.current?.stop();
+    setShowEndConfirm(false);
 
     const mediaRecorder = mediaRecorderRef.current;
-    let navigationTimeout: NodeJS.Timeout | null = null;
+    let showEndTimeout: NodeJS.Timeout | null = null;
     let fallbackTimeout: NodeJS.Timeout | null = null;
-    let hasNavigated = false;
+    let hasShown = false;
 
-    const navigateToEnd = () => {
-      if (hasNavigated) return; // Prevent multiple navigations
-      hasNavigated = true;
+    const showEndStage = () => {
+      if (hasShown) return;
+      hasShown = true;
 
-      if (navigationTimeout) {
-        clearTimeout(navigationTimeout);
-        navigationTimeout = null;
+      if (showEndTimeout) {
+        clearTimeout(showEndTimeout);
+        showEndTimeout = null;
       }
       if (fallbackTimeout) {
         clearTimeout(fallbackTimeout);
         fallbackTimeout = null;
       }
 
-      navigationTimeout = setTimeout(() => {
-        router.push("/end");
+      // Wait for recording to complete and state to update
+      showEndTimeout = setTimeout(() => {
+        setShowEndStage(true);
       }, 500);
     };
 
@@ -270,20 +269,25 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     ) {
       // Add event listener before stopping to ensure we catch the stop event
       const handleStop = () => {
-        navigateToEnd();
+        // Wait for state updates to propagate
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            showEndStage();
+          });
+        });
       };
 
       mediaRecorder.addEventListener("stop", handleStop, { once: true });
       stopRecording();
 
-      // Fallback: if stop event doesn't fire within 2 seconds, navigate anyway
+      // Fallback: show end stage after 2 seconds regardless
       fallbackTimeout = setTimeout(() => {
-        navigateToEnd();
+        showEndStage();
       }, 2000);
     } else {
-      navigateToEnd();
+      showEndStage();
     }
-  }, [stopRecording, router]);
+  }, [stopRecording]);
 
   const removeReaction = useCallback(
     (id: number) => {
@@ -305,7 +309,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   const liveStageProps = {
     viewerCount: viewerCountState,
-    duration,
+    duration: recordingDuration,
     streamTopic,
     comments,
     messageInput,
@@ -430,6 +434,23 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {showEndStage && (
+          <EndStage
+            viewerCount={viewerCountState}
+            commentCount={comments.length}
+            duration={recordingDuration}
+            downloadUrl={downloadUrl}
+            mimeType={recordingMimeType}
+            streamTopic={streamTopic}
+            streamerName={streamerName}
+            onReturnToStudio={() => {
+              setShowEndStage(false);
+              resetRecording();
+              onEndStream();
+            }}
+          />
+        )}
       </div>
     </>
   );

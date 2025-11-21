@@ -90,7 +90,7 @@ export const EndStage: React.FC<EndStageProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 bg-[#09090b] z-50 flex flex-col items-center justify-center p-4 sm:p-8 animate-in zoom-in duration-300">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 sm:p-8 animate-in zoom-in duration-300">
       <Card className="bg-[#18181b] p-6 sm:p-10 rounded-3xl border-white/10 w-full max-w-lg text-center shadow-2xl space-y-8">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 rounded-full flex items-center justify-center ring-2 ring-white/10 shadow-lg">

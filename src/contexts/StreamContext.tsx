@@ -7,6 +7,7 @@ import React, {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -71,7 +72,33 @@ interface StreamProviderProps {
 }
 
 export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
-  const [orientation, setOrientation] = useState<StreamOrientation>("vertical");
+  // Set default orientation based on screen size: horizontal for larger screens, vertical for mobile
+  const getDefaultOrientation = (): StreamOrientation => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 768 ? "horizontal" : "vertical";
+    }
+    return "horizontal"; // Default to horizontal for SSR
+  };
+
+  const [orientation, setOrientation] = useState<StreamOrientation>(
+    getDefaultOrientation()
+  );
+
+  // Update orientation on mount based on actual screen size
+  useEffect(() => {
+    const updateOrientation = () => {
+      const isLargeScreen = window.innerWidth >= 768;
+      if (isLargeScreen && orientation !== "horizontal") {
+        setOrientation("horizontal");
+      } else if (!isLargeScreen && orientation !== "vertical") {
+        setOrientation("vertical");
+      }
+    };
+
+    updateOrientation();
+    window.addEventListener("resize", updateOrientation);
+    return () => window.removeEventListener("resize", updateOrientation);
+  }, [orientation]);
   const [streamTopic, setStreamTopic] = useState("Just chatting! ☕️");
   const [streamerName, setStreamerName] = useState("You");
   const [isMuted, setIsMuted] = useState(false);

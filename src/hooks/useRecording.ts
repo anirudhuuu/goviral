@@ -29,13 +29,18 @@ export const useRecording = (): UseRecordingReturn => {
     setDuration(0);
     startTimeRef.current = Date.now();
 
+    // Clear any existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
 
+    // Start the timer interval
     intervalRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      setDuration(elapsed);
+      if (isMountedRef.current && startTimeRef.current > 0) {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        setDuration(elapsed);
+      }
     }, 1000);
 
     try {
@@ -83,55 +88,62 @@ export const useRecording = (): UseRecordingReturn => {
       };
 
       mediaRecorder.onstop = () => {
-        // Wait a bit to ensure all data chunks are collected
-        setTimeout(() => {
-          // Check if component is still mounted before updating state
-          if (!isMountedRef.current) return;
+        // Process immediately - onstop fires after all data is available
+        // Capture final duration
+        if (startTimeRef.current > 0) {
+          const finalDuration = Math.floor(
+            (Date.now() - startTimeRef.current) / 1000
+          );
+          setDuration(finalDuration);
+        }
 
-          if (chunksRef.current.length > 0) {
-            let finalMimeType =
-              mediaRecorder.mimeType || mimeType || "video/mp4";
+        if (chunksRef.current.length > 0) {
+          let finalMimeType = mediaRecorder.mimeType || mimeType || "video/mp4";
 
-            // Normalize mime type for better compatibility
-            if (
-              finalMimeType.includes("mp4") ||
-              finalMimeType.includes("avc1") ||
-              finalMimeType.includes("h264")
-            ) {
-              // Ensure MP4 mime type is correct
-              if (!finalMimeType.startsWith("video/mp4")) {
-                finalMimeType = "video/mp4";
-              }
-            } else if (finalMimeType.includes("webm")) {
-              // Keep WebM as is
-              finalMimeType = finalMimeType;
-            } else {
-              // Default to MP4 for best compatibility
+          // Normalize mime type for better compatibility
+          if (
+            finalMimeType.includes("mp4") ||
+            finalMimeType.includes("avc1") ||
+            finalMimeType.includes("h264")
+          ) {
+            // Ensure MP4 mime type is correct
+            if (!finalMimeType.startsWith("video/mp4")) {
               finalMimeType = "video/mp4";
             }
-
-            setMimeType(finalMimeType);
-
-            // Create blob with all collected chunks
-            const blob = new Blob(chunksRef.current, { type: finalMimeType });
-
-            // Verify blob size is reasonable (at least 1KB)
-            if (blob.size > 1024) {
-              const url = URL.createObjectURL(blob);
-              setDownloadUrl(url);
-            } else {
-              if (process.env.NODE_ENV === "development") {
-                console.warn(
-                  "Recording blob too small, may be incomplete:",
-                  blob.size
-                );
-              }
-              // Still set it, but warn
-              const url = URL.createObjectURL(blob);
-              setDownloadUrl(url);
-            }
+          } else if (finalMimeType.includes("webm")) {
+            // Keep WebM as is
+            finalMimeType = finalMimeType;
+          } else {
+            // Default to MP4 for best compatibility
+            finalMimeType = "video/mp4";
           }
-        }, 100);
+
+          setMimeType(finalMimeType);
+
+          // Create blob with all collected chunks
+          const blob = new Blob(chunksRef.current, { type: finalMimeType });
+
+          // Verify blob size is reasonable (at least 1KB)
+          if (blob.size > 1024) {
+            const url = URL.createObjectURL(blob);
+            setDownloadUrl(url);
+          } else {
+            if (process.env.NODE_ENV === "development") {
+              console.warn(
+                "Recording blob too small, may be incomplete:",
+                blob.size
+              );
+            }
+            // Still set it, but warn
+            const url = URL.createObjectURL(blob);
+            setDownloadUrl(url);
+          }
+        } else {
+          // If no chunks, still try to create a minimal blob or set error state
+          if (process.env.NODE_ENV === "development") {
+            console.warn("No recording chunks available");
+          }
+        }
       };
 
       mediaRecorder.onerror = (event) => {
@@ -150,6 +162,14 @@ export const useRecording = (): UseRecordingReturn => {
   }, []);
 
   const stopRecording = useCallback(() => {
+    // Capture final duration before clearing interval
+    if (intervalRef.current && startTimeRef.current > 0) {
+      const finalDuration = Math.floor(
+        (Date.now() - startTimeRef.current) / 1000
+      );
+      setDuration(finalDuration);
+    }
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -242,7 +262,12 @@ export const useRecording = (): UseRecordingReturn => {
           // Ignore errors during cleanup
         }
       }
+    };
+  }, []);
 
+  // Separate effect for cleaning up downloadUrl
+  useEffect(() => {
+    return () => {
       // Revoke blob URL to prevent memory leaks
       if (downloadUrl) {
         URL.revokeObjectURL(downloadUrl);

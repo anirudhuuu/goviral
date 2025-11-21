@@ -45,7 +45,7 @@ function LivePageContent() {
   }, [orientationParam, setOrientation]);
 
   const handleEndStream = () => {
-    router.push("/end");
+    router.push("/setup");
   };
 
   const handleSendMessage = () => {
