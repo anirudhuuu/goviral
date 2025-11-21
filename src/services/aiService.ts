@@ -6,13 +6,11 @@ export class AIService {
 
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
-    this.baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+    this.baseUrl =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
   }
 
-  private createSystemPrompt(
-    transcript: string,
-    streamTopic: string
-  ): string {
+  private createSystemPrompt(transcript: string, streamTopic: string): string {
     return `
       You are simulating authentic live stream viewers for: "${streamTopic}".
       
@@ -63,11 +61,12 @@ export class AIService {
       const text = data.candidates[0].content.parts[0].text;
       return JSON.parse(text) as AIResponse;
     } catch (error) {
-      console.error("AI Generation failed:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("AI Generation failed:", error);
+      }
       return null;
     }
   }
 }
 
 export const aiService = new AIService();
-

@@ -64,12 +64,16 @@ export const useRecording = (): UseRecordingReturn => {
       };
 
       mediaRecorder.onerror = (event) => {
-        console.error("MediaRecorder error:", event);
+        if (process.env.NODE_ENV === "development") {
+          console.error("MediaRecorder error:", event);
+        }
       };
 
       mediaRecorder.start(1000);
     } catch (error) {
-      console.error("Failed to start recording:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Failed to start recording:", error);
+      }
     }
   }, []);
 

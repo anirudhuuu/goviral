@@ -10,8 +10,10 @@ interface UseMediaDevicesReturn {
 
 export const useMediaDevices = (): UseMediaDevicesReturn => {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedVideoDeviceId, setSelectedVideoDeviceId] = useState<string>("");
-  const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState<string>("");
+  const [selectedVideoDeviceId, setSelectedVideoDeviceId] =
+    useState<string>("");
+  const [selectedAudioDeviceId, setSelectedAudioDeviceId] =
+    useState<string>("");
 
   useEffect(() => {
     const getDevices = async () => {
@@ -29,7 +31,9 @@ export const useMediaDevices = (): UseMediaDevicesReturn => {
           setSelectedAudioDeviceId(audioDevices[0].deviceId);
         }
       } catch (error) {
-        console.error("Error enumerating devices:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error enumerating devices:", error);
+        }
       }
     };
 
@@ -49,4 +53,3 @@ export const useMediaDevices = (): UseMediaDevicesReturn => {
     setSelectedAudioDeviceId,
   };
 };
-

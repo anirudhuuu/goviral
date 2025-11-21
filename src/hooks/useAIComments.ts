@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { aiService } from "@/services/aiService";
 import { Comment, StreamStage } from "@/types";
 import { SPEECH_CONFIG, COMMENT_CONFIG } from "@/constants";
@@ -25,6 +25,8 @@ export const useAIComments = ({
 }: UseAICommentsProps): UseAICommentsReturn => {
   const [lastProcessedTranscript, setLastProcessedTranscript] = useState("");
 
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
   const processTranscript = useCallback(async () => {
     const bufferLength = transcriptBuffer.length;
     const lastLength = lastProcessedTranscript.length;
@@ -44,27 +46,45 @@ export const useAIComments = ({
         aiData.comments.forEach(
           (c: { user?: string; text: string }, i: number) => {
             const jitter = Math.random() * 1500;
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
               onAddComment(createComment(c.user || "Guest", c.text, false));
             }, baseDelay + i * COMMENT_CONFIG.ANIMATION_DELAY + jitter);
+            timeoutsRef.current.push(timeout);
           }
         );
 
         if (aiData.dominantReaction) {
           const reactionDelay = Math.random() * 2000 + 1500;
-          setTimeout(() => onTriggerReaction(aiData.dominantReaction), reactionDelay);
+          const timeout = setTimeout(
+            () => onTriggerReaction(aiData.dominantReaction),
+            reactionDelay
+          );
+          timeoutsRef.current.push(timeout);
         }
       }
     }
-  }, [transcriptBuffer, lastProcessedTranscript, streamTopic, onAddComment, onTriggerReaction]);
+  }, [
+    transcriptBuffer,
+    lastProcessedTranscript,
+    streamTopic,
+    onAddComment,
+    onTriggerReaction,
+  ]);
 
   useEffect(() => {
     if (stage !== "live") return;
 
-    const interval = setInterval(processTranscript, SPEECH_CONFIG.CHECK_INTERVAL);
-    return () => clearInterval(interval);
+    const interval = setInterval(
+      processTranscript,
+      SPEECH_CONFIG.CHECK_INTERVAL
+    );
+
+    return () => {
+      clearInterval(interval);
+      timeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+      timeoutsRef.current = [];
+    };
   }, [stage, processTranscript]);
 
   return { lastProcessedTranscript };
 };
-

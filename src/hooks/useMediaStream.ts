@@ -14,6 +14,8 @@ interface UseMediaStreamProps {
 interface UseMediaStreamReturn {
   currentStream: MediaStream | null;
   streamRef: React.RefObject<MediaStream | null>;
+  error: string | null;
+  isLoading: boolean;
 }
 
 export const useMediaStream = ({
@@ -25,10 +27,15 @@ export const useMediaStream = ({
   quality = "720p",
 }: UseMediaStreamProps): UseMediaStreamReturn => {
   const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     const startCamera = async () => {
+      setIsLoading(true);
+      setError(null);
+
       try {
         if (streamRef.current) {
           streamRef.current.getTracks().forEach((t) => t.stop());
@@ -55,8 +62,31 @@ export const useMediaStream = ({
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         streamRef.current = stream;
         setCurrentStream(stream);
+        setError(null);
       } catch (err) {
-        console.error("Error accessing media devices:", err);
+        const error = err as Error;
+        let errorMessage = "Failed to access camera or microphone";
+
+        if (
+          error.name === "NotAllowedError" ||
+          error.name === "PermissionDeniedError"
+        ) {
+          errorMessage =
+            "Camera and microphone access denied. Please grant permissions.";
+        } else if (error.name === "NotFoundError") {
+          errorMessage = "No camera or microphone found.";
+        } else if (error.name === "NotReadableError") {
+          errorMessage = "Camera or microphone is already in use.";
+        }
+
+        setError(errorMessage);
+        setCurrentStream(null);
+
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error accessing media devices:", err);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -74,6 +104,5 @@ export const useMediaStream = ({
     }
   }, [isMuted, isVideoEnabled]);
 
-  return { currentStream, streamRef };
+  return { currentStream, streamRef, error, isLoading };
 };
-
