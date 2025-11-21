@@ -1,15 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { StreamStage } from "@/types";
 import { VIEWER_COUNT_CONFIG } from "@/constants";
 import { generateRandomViewerChange } from "@/utils/helpers";
 
 export const useViewerCount = (stage: StreamStage): number => {
   const [viewerCount, setViewerCount] = useState(0);
+  const isMountedRef = useRef<boolean>(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    
     if (stage !== "live") return;
 
     const countInterval = setInterval(() => {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+      
       setViewerCount((prev) => {
         const change = generateRandomViewerChange(
           VIEWER_COUNT_CONFIG.MAX_CHANGE,
@@ -19,7 +25,10 @@ export const useViewerCount = (stage: StreamStage): number => {
       });
     }, VIEWER_COUNT_CONFIG.UPDATE_INTERVAL);
 
-    return () => clearInterval(countInterval);
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(countInterval);
+    };
   }, [stage]);
 
   return viewerCount;

@@ -33,8 +33,11 @@ export const useSpeechRecognition = (
 ): UseSpeechRecognitionReturn => {
   const [transcriptBuffer, setTranscriptBuffer] = useState("");
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     if (stage !== "live") return;
     if (typeof window === "undefined" || !("webkitSpeechRecognition" in window))
       return;
@@ -51,6 +54,9 @@ export const useSpeechRecognition = (
     recognition.lang = SPEECH_CONFIG.LANGUAGE;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+
       let finalTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
@@ -65,9 +71,11 @@ export const useSpeechRecognition = (
     recognitionRef.current = recognition;
     recognition.start();
 
-    return () => recognition.stop();
+    return () => {
+      isMountedRef.current = false;
+      recognition.stop();
+    };
   }, [stage]);
 
   return { transcriptBuffer, recognitionRef };
 };
-

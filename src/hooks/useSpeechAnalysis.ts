@@ -36,6 +36,7 @@ export const useSpeechAnalysis = (transcript: string, isActive: boolean) => {
 
   const startTimeRef = useRef<number>(0);
   const wasActiveRef = useRef(false);
+  const isMountedRef = useRef<boolean>(true);
 
   useEffect(() => {
     if (isActive && !wasActiveRef.current) {
@@ -47,11 +48,16 @@ export const useSpeechAnalysis = (transcript: string, isActive: boolean) => {
   }, [isActive]);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     if (!isActive || !transcript || !wasActiveRef.current) {
       return;
     }
 
     const updateMetrics = () => {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+
       const words = transcript
         .toLowerCase()
         .split(/\s+/)
@@ -89,7 +95,10 @@ export const useSpeechAnalysis = (transcript: string, isActive: boolean) => {
     const interval = setInterval(updateMetrics, 1000);
     updateMetrics();
 
-    return () => clearInterval(interval);
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+    };
   }, [transcript, isActive]);
 
   return metrics;

@@ -244,11 +244,22 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
     const mediaRecorder = mediaRecorderRef.current;
     let navigationTimeout: NodeJS.Timeout | null = null;
+    let fallbackTimeout: NodeJS.Timeout | null = null;
+    let hasNavigated = false;
 
     const navigateToEnd = () => {
+      if (hasNavigated) return; // Prevent multiple navigations
+      hasNavigated = true;
+      
       if (navigationTimeout) {
         clearTimeout(navigationTimeout);
+        navigationTimeout = null;
       }
+      if (fallbackTimeout) {
+        clearTimeout(fallbackTimeout);
+        fallbackTimeout = null;
+      }
+      
       navigationTimeout = setTimeout(() => {
         router.push("/end");
       }, 500);
@@ -267,7 +278,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
       stopRecording();
 
       // Fallback: if stop event doesn't fire within 2 seconds, navigate anyway
-      setTimeout(() => {
+      fallbackTimeout = setTimeout(() => {
         navigateToEnd();
       }, 2000);
     } else {

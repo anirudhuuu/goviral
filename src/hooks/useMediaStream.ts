@@ -30,8 +30,11 @@ export const useMediaStream = ({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const streamRef = useRef<MediaStream | null>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     const startCamera = async () => {
       setIsLoading(true);
       setError(null);
@@ -60,10 +63,21 @@ export const useMediaStream = ({
         };
 
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        // Check if component is still mounted before updating state
+        if (!isMountedRef.current) {
+          // Clean up stream if component unmounted during async operation
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
         streamRef.current = stream;
         setCurrentStream(stream);
         setError(null);
       } catch (err) {
+        // Only update state if component is still mounted
+        if (!isMountedRef.current) return;
+
         const error = err as Error;
         let errorMessage = "Failed to access camera or microphone";
 
@@ -86,7 +100,10 @@ export const useMediaStream = ({
           console.error("Error accessing media devices:", err);
         }
       } finally {
-        setIsLoading(false);
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -94,6 +111,8 @@ export const useMediaStream = ({
 
     // Cleanup function to stop tracks when component unmounts or dependencies change
     return () => {
+      isMountedRef.current = false;
+
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
