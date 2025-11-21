@@ -17,6 +17,7 @@ interface DeviceSettingsProps {
   onVideoDeviceChange: (deviceId: string) => void;
   onAudioDeviceChange: (deviceId: string) => void;
   onQualityChange: (quality: VideoQuality) => void;
+  disabled?: boolean;
 }
 
 export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
@@ -27,6 +28,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
   onVideoDeviceChange,
   onAudioDeviceChange,
   onQualityChange,
+  disabled = false,
 }) => {
   const videoDevices = devices.filter((d) => d.kind === "videoinput");
   const audioDevices = devices.filter((d) => d.kind === "audioinput");
@@ -38,8 +40,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
         <Select
           value={selectedVideoDeviceId}
           onValueChange={onVideoDeviceChange}
+          disabled={disabled}
         >
-          <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
+          <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white" disabled={disabled}>
             <SelectValue placeholder="Select Camera" />
           </SelectTrigger>
           <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
@@ -57,8 +60,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
         <Select
           value={selectedAudioDeviceId}
           onValueChange={onAudioDeviceChange}
+          disabled={disabled}
         >
-          <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
+          <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white" disabled={disabled}>
             <SelectValue placeholder="Select Microphone" />
           </SelectTrigger>
           <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
@@ -74,6 +78,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = ({
       <StreamQualitySelector
         selectedQuality={selectedQuality}
         onQualityChange={onQualityChange}
+        disabled={disabled}
       />
     </div>
   );

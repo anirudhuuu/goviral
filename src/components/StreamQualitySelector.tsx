@@ -25,11 +25,13 @@ export const QUALITY_PRESETS: Record<VideoQuality, QualityConfig> = {
 interface StreamQualitySelectorProps {
   selectedQuality: VideoQuality;
   onQualityChange: (quality: VideoQuality) => void;
+  disabled?: boolean;
 }
 
 export const StreamQualitySelector: React.FC<StreamQualitySelectorProps> = ({
   selectedQuality,
   onQualityChange,
+  disabled = false,
 }) => {
   return (
     <div className="space-y-2">
@@ -37,8 +39,9 @@ export const StreamQualitySelector: React.FC<StreamQualitySelectorProps> = ({
       <Select
         value={selectedQuality}
         onValueChange={(v) => onQualityChange(v as VideoQuality)}
+        disabled={disabled}
       >
-        <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
+        <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white" disabled={disabled}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="bg-zinc-900 border-zinc-800 text-white">

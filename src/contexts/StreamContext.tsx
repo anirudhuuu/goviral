@@ -84,21 +84,8 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({ children }) => {
     getDefaultOrientation()
   );
 
-  // Update orientation on mount based on actual screen size
-  useEffect(() => {
-    const updateOrientation = () => {
-      const isLargeScreen = window.innerWidth >= 768;
-      if (isLargeScreen && orientation !== "horizontal") {
-        setOrientation("horizontal");
-      } else if (!isLargeScreen && orientation !== "vertical") {
-        setOrientation("vertical");
-      }
-    };
-
-    updateOrientation();
-    window.addEventListener("resize", updateOrientation);
-    return () => window.removeEventListener("resize", updateOrientation);
-  }, [orientation]);
+  // Initial orientation is set via getDefaultOrientation() in useState
+  // User can manually change it - we don't override their choice
   const [streamTopic, setStreamTopic] = useState("Just chatting! ☕️");
   const [streamerName, setStreamerName] = useState("You");
   const [isMuted, setIsMuted] = useState(false);

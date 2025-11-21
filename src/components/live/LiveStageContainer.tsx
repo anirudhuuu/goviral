@@ -108,11 +108,8 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
   const [showEndStage, setShowEndStage] = useState(false);
 
   const {
-    devices,
     selectedVideoDeviceId,
     selectedAudioDeviceId,
-    setSelectedVideoDeviceId,
-    setSelectedAudioDeviceId,
   } = useMediaDevices();
 
   const { currentStream, streamRef } = useMediaStream({
@@ -140,62 +137,12 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     return () => cancelAnimationFrame(rafId);
   }, [viewerCount, onViewerCountChange, showEndStage]);
 
-  const previousQualityRef = useRef<VideoQuality>(quality);
-  const previousVideoDeviceRef = useRef<string>(selectedVideoDeviceId);
-  const previousAudioDeviceRef = useRef<string>(selectedAudioDeviceId);
-  const previousOrientationRef = useRef<StreamOrientation>(orientation);
-  const isStreamChangingRef = useRef<boolean>(false);
-
   useEffect(() => {
     if (currentStream && streamRef.current) {
       const recorder = mediaRecorderRef.current;
-      const qualityChanged = previousQualityRef.current !== quality;
-      const videoDeviceChanged =
-        previousVideoDeviceRef.current !== selectedVideoDeviceId;
-      const audioDeviceChanged =
-        previousAudioDeviceRef.current !== selectedAudioDeviceId;
-      const orientationChanged = previousOrientationRef.current !== orientation;
-
-      const streamChanged =
-        qualityChanged ||
-        videoDeviceChanged ||
-        audioDeviceChanged ||
-        orientationChanged;
-
-      if (streamChanged && recorder && recorder.state === "recording") {
-        // Stream changed while recording - stop current segment and start new one
-        isStreamChangingRef.current = true;
-
-        const handleStop = () => {
-          // Wait a bit for all chunks to be collected, then start new recording
-          setTimeout(() => {
-            if (streamRef.current && !showEndStage) {
-              startRecording(streamRef.current, true);
-            }
-            isStreamChangingRef.current = false;
-          }, 100);
-        };
-
-        recorder.addEventListener("stop", handleStop, { once: true });
-        stopRecording();
-
-        // Update all previous refs
-        previousQualityRef.current = quality;
-        previousVideoDeviceRef.current = selectedVideoDeviceId;
-        previousAudioDeviceRef.current = selectedAudioDeviceId;
-        previousOrientationRef.current = orientation;
-        return;
-      }
-
       // Only start recording if not already recording
       if (!recorder || recorder.state === "inactive") {
         startRecording(streamRef.current);
-
-        // Update all previous refs
-        previousQualityRef.current = quality;
-        previousVideoDeviceRef.current = selectedVideoDeviceId;
-        previousAudioDeviceRef.current = selectedAudioDeviceId;
-        previousOrientationRef.current = orientation;
       }
     }
 
@@ -203,34 +150,16 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     const recorderForCleanup = mediaRecorderRef.current;
 
     return () => {
-      // Only stop recording on cleanup if not changing stream
-      if (isStreamChangingRef.current) return;
-
       // Use captured ref value instead of accessing .current in cleanup
       if (
         recorderForCleanup &&
         (recorderForCleanup.state === "recording" ||
-          recorderForCleanup.state === "paused") &&
-        previousQualityRef.current === quality &&
-        previousVideoDeviceRef.current === selectedVideoDeviceId &&
-        previousAudioDeviceRef.current === selectedAudioDeviceId &&
-        previousOrientationRef.current === orientation
+          recorderForCleanup.state === "paused")
       ) {
         stopRecording();
       }
     };
-  }, [
-    currentStream,
-    quality,
-    selectedVideoDeviceId,
-    selectedAudioDeviceId,
-    orientation,
-    startRecording,
-    stopRecording,
-    showEndStage,
-    mediaRecorderRef,
-    streamRef,
-  ]);
+  }, [currentStream, startRecording, stopRecording, mediaRecorderRef, streamRef]);
 
   const addComment = useCallback(
     (comment: Comment) => {
@@ -392,10 +321,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     showEmojiPicker,
     isMuted,
     currentFilter,
-    devices,
-    selectedVideoDeviceId,
-    selectedAudioDeviceId,
-    selectedQuality: quality,
     chatContainerRef,
     onEndStream: handleEndStreamClick,
     onMessageChange,
@@ -405,9 +330,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     onToggleMute,
     onToggleFilter,
     onTriggerReaction: triggerBurst,
-    onVideoDeviceChange: setSelectedVideoDeviceId,
-    onAudioDeviceChange: setSelectedAudioDeviceId,
-    onQualityChange,
     onPinComment,
     onUnpinComment,
   };

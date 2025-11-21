@@ -91,15 +91,20 @@ export const SetupStage: React.FC<SetupStageProps> = ({
         <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-white">
           GoViral Studio
         </h1>
-        <TooltipProvider>
-          <Tooltip>
+      </div>
+
+      <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-start justify-center p-6 lg:p-8 gap-6 lg:gap-8 w-full max-w-7xl mx-auto pb-8">
+        <div className="w-full lg:w-auto order-1 lg:order-2 shrink-0 flex flex-col items-center">
+          <div className="mb-2">
             <Sheet>
               <SheetTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-zinc-500">
-                    <Settings size={20} />
-                  </Button>
-                </TooltipTrigger>
+                <Button
+                  variant="outline"
+                  className="bg-zinc-900/50 border-zinc-800 text-white hover:bg-zinc-800/50 hover:border-zinc-700"
+                >
+                  <Settings size={18} className="mr-2" />
+                  Stream Settings
+                </Button>
               </SheetTrigger>
               <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
                 <SheetHeader className="p-6 border-b border-white/10">
@@ -121,15 +126,8 @@ export const SetupStage: React.FC<SetupStageProps> = ({
                 />
               </SheetContent>
             </Sheet>
-            <TooltipContent>
-              <p>Device Settings</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+          </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-start justify-center p-6 lg:p-8 gap-6 lg:gap-8 w-full max-w-7xl mx-auto pb-8">
-        <div className="w-full lg:w-auto order-1 lg:order-2 shrink-0 flex items-center justify-center">
           <div className="relative w-full max-w-[600px] h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center">
             <div
               className={`relative overflow-hidden bg-zinc-900 ring-1 ring-white/10 shadow-2xl rounded-2xl transition-all duration-500 ease-in-out ${
@@ -361,6 +359,19 @@ export const SetupStage: React.FC<SetupStageProps> = ({
           </div>
         </div>
       </div>
+
+      <footer className="mt-auto py-6 px-4 lg:px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+          <div className="flex items-center gap-2">
+            <span>GoViral Studio</span>
+            <span className="text-zinc-700">•</span>
+            <span>Professional Live Streaming</span>
+          </div>
+          <div className="text-zinc-600">
+            Configure your settings before going live
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

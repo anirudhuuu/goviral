@@ -2,14 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -22,14 +14,12 @@ import {
   Mic,
   MicOff,
   Pin,
-  Settings,
   Sparkles,
   User,
 } from "lucide-react";
 import React from "react";
 import { ChatInput } from "./ChatInput";
 import { CommentItem } from "./CommentItem";
-import { DeviceSettings } from "./DeviceSettings";
 
 interface LiveStageHorizontalProps {
   viewerCount: number;
@@ -40,10 +30,6 @@ interface LiveStageHorizontalProps {
   showEmojiPicker: boolean;
   isMuted: boolean;
   currentFilter: number;
-  devices: MediaDeviceInfo[];
-  selectedVideoDeviceId: string;
-  selectedAudioDeviceId: string;
-  selectedQuality: VideoQuality;
   chatContainerRef: React.RefObject<HTMLDivElement | null>;
   onEndStream: () => void;
   onMessageChange: (message: string) => void;
@@ -53,9 +39,6 @@ interface LiveStageHorizontalProps {
   onToggleMute: () => void;
   onToggleFilter: () => void;
   onTriggerReaction: (type: string) => void;
-  onVideoDeviceChange: (deviceId: string) => void;
-  onAudioDeviceChange: (deviceId: string) => void;
-  onQualityChange: (quality: VideoQuality) => void;
   onPinComment: (commentId: number) => void;
   onUnpinComment: (commentId: number) => void;
 }
@@ -69,10 +52,6 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
   showEmojiPicker,
   isMuted,
   currentFilter,
-  devices,
-  selectedVideoDeviceId,
-  selectedAudioDeviceId,
-  selectedQuality,
   chatContainerRef,
   onEndStream,
   onMessageChange,
@@ -82,9 +61,6 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
   onToggleMute,
   onToggleFilter,
   onTriggerReaction,
-  onVideoDeviceChange,
-  onAudioDeviceChange,
-  onQualityChange,
   onPinComment,
   onUnpinComment,
 }) => {
@@ -286,45 +262,6 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
             </Badge>
           </div>
           <div className="flex items-center gap-2 pointer-events-auto">
-            <Sheet>
-              <TooltipProvider>
-                <Tooltip>
-                  <SheetTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 bg-black/70 backdrop-blur-md rounded-md border border-white/10 text-zinc-400 hover:text-white hover:bg-black/90"
-                      >
-                        <Settings size={14} />
-                      </Button>
-                    </TooltipTrigger>
-                  </SheetTrigger>
-                  <TooltipContent>
-                    <p>Settings</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <SheetContent className="bg-[#18181b] border-white/10 text-white p-0 flex flex-col gap-0">
-                <SheetHeader className="p-6 border-b border-white/10">
-                  <SheetTitle className="text-white">
-                    Stream Settings
-                  </SheetTitle>
-                  <SheetDescription className="text-zinc-400">
-                    Configure your audio and video devices.
-                  </SheetDescription>
-                </SheetHeader>
-                <DeviceSettings
-                  devices={devices}
-                  selectedVideoDeviceId={selectedVideoDeviceId}
-                  selectedAudioDeviceId={selectedAudioDeviceId}
-                  selectedQuality={selectedQuality}
-                  onVideoDeviceChange={onVideoDeviceChange}
-                  onAudioDeviceChange={onAudioDeviceChange}
-                  onQualityChange={onQualityChange}
-                />
-              </SheetContent>
-            </Sheet>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
