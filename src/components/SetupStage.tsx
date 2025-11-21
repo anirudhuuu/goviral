@@ -128,183 +128,181 @@ export const SetupStage: React.FC<SetupStageProps> = ({
         </TooltipProvider>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-center justify-center p-6 lg:p-8 gap-6 lg:gap-8 w-full max-w-7xl mx-auto pb-8">
-        <div className="w-full lg:w-auto order-1 lg:order-2 shrink-0">
-          <div
-            className={`relative w-full overflow-hidden bg-zinc-900 ring-1 ring-white/10 shadow-2xl rounded-2xl transition-all duration-500 ${
-              orientation === "vertical"
-                ? "aspect-9/16 max-w-sm lg:max-w-md max-h-[60vh] lg:max-h-[600px] min-h-[400px] mx-auto"
-                : "aspect-video max-w-3xl min-h-[300px] mx-auto"
-            }`}
-          >
-            <VideoFeed
-              stream={currentStream}
-              filterClass={VIDEO_FILTERS[currentFilter].class}
-            />
+      <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-start justify-center p-6 lg:p-8 gap-6 lg:gap-8 w-full max-w-7xl mx-auto pb-8">
+        <div className="w-full lg:w-auto order-1 lg:order-2 shrink-0 flex items-center justify-center">
+          <div className="relative w-full max-w-[600px] h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center">
+            <div
+              className={`relative overflow-hidden bg-zinc-900 ring-1 ring-white/10 shadow-2xl rounded-2xl transition-all duration-500 ease-in-out ${
+                orientation === "vertical"
+                  ? "w-[225px] h-[400px] sm:w-[281.25px] sm:h-[500px] lg:w-[337.5px] lg:h-[600px]"
+                  : "w-[400px] h-[225px] sm:w-[500px] sm:h-[281.25px] lg:w-[600px] lg:h-[337.5px]"
+              }`}
+            >
+              <VideoFeed
+                stream={currentStream}
+                filterClass={VIDEO_FILTERS[currentFilter].class}
+              />
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onToggleMute}
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-white/10 rounded-full text-white"
-                    >
-                      {isMuted ? (
-                        <MicOff size={18} className="text-amber-400" />
-                      ) : (
-                        <Mic size={18} />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isMuted ? "Unmute" : "Mute"}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onToggleVideo}
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-white/10 rounded-full text-white"
-                    >
-                      {isVideoEnabled ? (
-                        <VideoIcon size={18} />
-                      ) : (
-                        <VideoOff size={18} className="text-amber-400" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      {isVideoEnabled ? "Turn Off Camera" : "Turn On Camera"}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onToggleFilter}
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-white/10 rounded-full text-white"
-                    >
-                      <Sparkles
-                        size={18}
-                        className={currentFilter !== 0 ? "text-blue-400" : ""}
-                      />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Change Filter: {VIDEO_FILTERS[currentFilter].name}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full lg:w-auto order-3 lg:order-3 shrink-0">
-          <div className="w-full lg:w-80 space-y-6">
-            <div className="w-full space-y-3">
-              <Label className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
-                Stream Format
-              </Label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button
-                        onClick={() => onOrientationChange("vertical")}
-                        className={`relative h-32 rounded-xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                          orientation === "vertical"
-                            ? "bg-blue-500/10 border-2 border-blue-500 shadow-lg shadow-blue-500/20"
-                            : "bg-zinc-900/50 border-2 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50"
-                        }`}
+                      <Button
+                        onClick={onToggleMute}
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-white/10 rounded-full text-white"
                       >
-                        <Smartphone
-                          size={28}
-                          className={
-                            orientation === "vertical"
-                              ? "text-blue-400"
-                              : "text-zinc-500"
-                          }
-                        />
-                        <div className="text-center">
-                          <div
-                            className={`text-sm font-semibold ${
-                              orientation === "vertical"
-                                ? "text-white"
-                                : "text-zinc-400"
-                            }`}
-                          >
-                            Vertical
-                          </div>
-                          <div className="text-xs text-zinc-500 mt-0.5">
-                            9:16 Mobile
-                          </div>
-                        </div>
-                        {orientation === "vertical" && (
-                          <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                        {isMuted ? (
+                          <MicOff size={18} className="text-amber-400" />
+                        ) : (
+                          <Mic size={18} />
                         )}
-                      </button>
+                      </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Best for mobile viewers & social media</p>
+                      <p>{isMuted ? "Unmute" : "Mute"}</p>
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button
-                        onClick={() => onOrientationChange("horizontal")}
-                        className={`relative h-32 rounded-xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                          orientation === "horizontal"
-                            ? "bg-blue-500/10 border-2 border-blue-500 shadow-lg shadow-blue-500/20"
-                            : "bg-zinc-900/50 border-2 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50"
-                        }`}
+                      <Button
+                        onClick={onToggleVideo}
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-white/10 rounded-full text-white"
                       >
-                        <Monitor
-                          size={28}
-                          className={
-                            orientation === "horizontal"
-                              ? "text-blue-400"
-                              : "text-zinc-500"
-                          }
-                        />
-                        <div className="text-center">
-                          <div
-                            className={`text-sm font-semibold ${
-                              orientation === "horizontal"
-                                ? "text-white"
-                                : "text-zinc-400"
-                            }`}
-                          >
-                            Horizontal
-                          </div>
-                          <div className="text-xs text-zinc-500 mt-0.5">
-                            16:9 Desktop
-                          </div>
-                        </div>
-                        {orientation === "horizontal" && (
-                          <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                        {isVideoEnabled ? (
+                          <VideoIcon size={18} />
+                        ) : (
+                          <VideoOff size={18} className="text-amber-400" />
                         )}
-                      </button>
+                      </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Best for desktop viewers & YouTube</p>
+                      <p>
+                        {isVideoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={onToggleFilter}
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-white/10 rounded-full text-white"
+                      >
+                        <Sparkles
+                          size={18}
+                          className={currentFilter !== 0 ? "text-blue-400" : ""}
+                        />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Change Filter: {VIDEO_FILTERS[currentFilter].name}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="h-4"></div>
+        <div className="w-full lg:w-80 order-3 lg:order-3 shrink-0 space-y-6">
+          <div className="w-full space-y-3">
+            <Label className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+              Stream Format
+            </Label>
+            <div className="grid grid-cols-2 gap-3">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => onOrientationChange("vertical")}
+                      className={`relative h-32 rounded-xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                        orientation === "vertical"
+                          ? "bg-blue-500/10 border-2 border-blue-500 shadow-lg shadow-blue-500/20"
+                          : "bg-zinc-900/50 border-2 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50"
+                      }`}
+                    >
+                      <Smartphone
+                        size={28}
+                        className={
+                          orientation === "vertical"
+                            ? "text-blue-400"
+                            : "text-zinc-500"
+                        }
+                      />
+                      <div className="text-center">
+                        <div
+                          className={`text-sm font-semibold ${
+                            orientation === "vertical"
+                              ? "text-white"
+                              : "text-zinc-400"
+                          }`}
+                        >
+                          Vertical
+                        </div>
+                        <div className="text-xs text-zinc-500 mt-0.5">
+                          9:16 Mobile
+                        </div>
+                      </div>
+                      {orientation === "vertical" && (
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Best for mobile viewers & social media</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => onOrientationChange("horizontal")}
+                      className={`relative h-32 rounded-xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                        orientation === "horizontal"
+                          ? "bg-blue-500/10 border-2 border-blue-500 shadow-lg shadow-blue-500/20"
+                          : "bg-zinc-900/50 border-2 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50"
+                      }`}
+                    >
+                      <Monitor
+                        size={28}
+                        className={
+                          orientation === "horizontal"
+                            ? "text-blue-400"
+                            : "text-zinc-500"
+                        }
+                      />
+                      <div className="text-center">
+                        <div
+                          className={`text-sm font-semibold ${
+                            orientation === "horizontal"
+                              ? "text-white"
+                              : "text-zinc-400"
+                          }`}
+                        >
+                          Horizontal
+                        </div>
+                        <div className="text-xs text-zinc-500 mt-0.5">
+                          16:9 Desktop
+                        </div>
+                      </div>
+                      {orientation === "horizontal" && (
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Best for desktop viewers & YouTube</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
 
-          <div className="w-full lg:w-80 space-y-5">
+          <div className="space-y-5">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
