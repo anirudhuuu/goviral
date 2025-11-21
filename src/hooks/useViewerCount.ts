@@ -1,0 +1,27 @@
+import { useState, useEffect } from "react";
+import { StreamStage } from "@/types";
+import { VIEWER_COUNT_CONFIG } from "@/constants";
+import { generateRandomViewerChange } from "@/utils/helpers";
+
+export const useViewerCount = (stage: StreamStage): number => {
+  const [viewerCount, setViewerCount] = useState(0);
+
+  useEffect(() => {
+    if (stage !== "live") return;
+
+    const countInterval = setInterval(() => {
+      setViewerCount((prev) => {
+        const change = generateRandomViewerChange(
+          VIEWER_COUNT_CONFIG.MAX_CHANGE,
+          VIEWER_COUNT_CONFIG.VARIANCE
+        );
+        return Math.max(VIEWER_COUNT_CONFIG.MIN_COUNT, prev + change);
+      });
+    }, VIEWER_COUNT_CONFIG.UPDATE_INTERVAL);
+
+    return () => clearInterval(countInterval);
+  }, [stage]);
+
+  return viewerCount;
+};
+
