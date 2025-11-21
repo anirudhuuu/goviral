@@ -109,12 +109,12 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
 
   return (
     <>
-      <div className="absolute top-0 inset-x-0 h-32 bg-linear-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
-      <div className="absolute bottom-0 inset-x-0 h-64 bg-linear-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
+      <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
 
       <div className="absolute top-0 left-0 right-0 p-4 pt-12 z-30 flex justify-between items-start">
         <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-xl rounded-full p-1 pr-4 border border-white/5">
-          <div className="w-8 h-8 rounded-full bg-linear-to-br from-zinc-700 to-zinc-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-600 flex items-center justify-center">
             <User size={14} className="text-white" />
           </div>
           <div className="flex flex-col">
@@ -249,7 +249,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 pt-4 z-30 space-y-3 bg-linear-to-t from-black/90 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 pt-4 z-30 space-y-3 bg-gradient-to-t from-black/90 to-transparent">
         <ChatInput
           messageInput={messageInput}
           showEmojiPicker={showEmojiPicker}
@@ -298,7 +298,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                 >
                   <Sparkles
                     size={20}
-                    className={currentFilter !== 0 ? "text-blue-400" : ""}
+                    className={currentFilter !== 0 ? "text-red-400" : ""}
                   />
                 </Button>
               </TooltipTrigger>
@@ -316,7 +316,7 @@ export const LiveStageVertical: React.FC<LiveStageVerticalProps> = ({
                   }}
                   variant="default"
                   size="icon"
-                  className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 text-white"
+                  className="w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20 text-white"
                 >
                   <Heart size={20} fill="currentColor" />
                 </Button>

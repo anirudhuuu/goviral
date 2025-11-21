@@ -126,8 +126,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           className={`transition-colors shrink-0 h-8 w-8 ${
             messageInput.trim()
               ? isVertical
-                ? "text-blue-400 hover:text-blue-300"
-                : "text-blue-500 hover:text-blue-400"
+                ? "text-red-400 hover:text-red-300"
+                : "text-red-500 hover:text-red-400"
               : isVertical
               ? "text-white/30"
               : "text-zinc-600"

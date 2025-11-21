@@ -195,7 +195,7 @@ export const SetupStage: React.FC<SetupStageProps> = ({
                       >
                         <Sparkles
                           size={18}
-                          className={currentFilter !== 0 ? "text-blue-400" : ""}
+                          className={currentFilter !== 0 ? "text-red-400" : ""}
                         />
                       </Button>
                     </TooltipTrigger>
@@ -312,7 +312,7 @@ export const SetupStage: React.FC<SetupStageProps> = ({
                   type="text"
                   value={streamerName}
                   onChange={(e) => onStreamerNameChange(e.target.value)}
-                  className="w-full bg-zinc-900/50 border-zinc-800 text-white rounded-xl px-4 py-5 text-base focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 focus-visible:ring-offset-zinc-900 placeholder:text-zinc-600"
+                  className="w-full bg-zinc-900/50 border-zinc-800 text-white rounded-xl px-4 py-5 text-base focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-0 focus-visible:ring-offset-zinc-900 placeholder:text-zinc-600"
                   placeholder="Enter your name..."
                   aria-label="Your name"
                   required
@@ -326,7 +326,7 @@ export const SetupStage: React.FC<SetupStageProps> = ({
                   type="text"
                   value={streamTopic}
                   onChange={(e) => onStreamTopicChange(e.target.value)}
-                  className="w-full bg-zinc-900/50 border-zinc-800 text-white rounded-xl px-4 py-5 text-base focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 focus-visible:ring-offset-zinc-900 placeholder:text-zinc-600"
+                  className="w-full bg-zinc-900/50 border-zinc-800 text-white rounded-xl px-4 py-5 text-base focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-0 focus-visible:ring-offset-zinc-900 placeholder:text-zinc-600"
                   placeholder="Enter a catchy title..."
                   aria-label="Stream title"
                   required

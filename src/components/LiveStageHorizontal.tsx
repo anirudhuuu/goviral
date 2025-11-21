@@ -221,7 +221,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                   >
                     <Sparkles
                       size={16}
-                      className={`mr-1.5 ${currentFilter !== 0 ? "text-blue-400" : ""}`}
+                      className={`mr-1.5 ${currentFilter !== 0 ? "text-red-400" : ""}`}
                     />
                     <span className="text-xs font-medium">Filter</span>
                   </Button>
@@ -240,7 +240,7 @@ export const LiveStageHorizontal: React.FC<LiveStageHorizontalProps> = ({
                     }}
                     variant="ghost"
                     size="sm"
-                    className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-blue-400 hover:text-blue-300 border border-zinc-700/50 h-9"
+                    className="flex-1 bg-zinc-800/60 hover:bg-zinc-800 text-red-400 hover:text-red-300 border border-zinc-700/50 h-9"
                   >
                     <Heart size={16} fill="currentColor" className="mr-1.5" />
                     <span className="text-xs font-medium">React</span>
