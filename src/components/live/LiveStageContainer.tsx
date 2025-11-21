@@ -29,7 +29,11 @@ import { PracticeMode } from "@/components/PracticeMode";
 import { useStreamContext } from "@/contexts/StreamContext";
 import { StreamOrientation, Comment, Reaction, VideoQuality } from "@/types";
 import { VIDEO_FILTERS, REACTION_CONFIG, COMMENT_CONFIG } from "@/constants";
-import { createComment, limitComments, getContainerClassName } from "@/utils/helpers";
+import {
+  createComment,
+  limitComments,
+  getContainerClassName,
+} from "@/utils/helpers";
 
 interface LiveStageContainerProps {
   orientation: StreamOrientation;
@@ -126,10 +130,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   const { transcriptBuffer, recognitionRef } = useSpeechRecognition("live");
 
-  const speechMetrics = useSpeechAnalysis(
-    transcriptBuffer,
-    isPracticeMode
-  );
+  const speechMetrics = useSpeechAnalysis(transcriptBuffer, isPracticeMode);
 
   const viewerCount = useViewerCount("live");
 
@@ -142,10 +143,18 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   useEffect(() => {
     if (currentStream && streamRef.current) {
-      startRecording(streamRef.current);
+      // Only start recording if not already recording
+      const recorder = mediaRecorderRef.current;
+      if (!recorder || recorder.state === "inactive") {
+        startRecording(streamRef.current);
+      }
     }
     return () => {
-      stopRecording();
+      // Stop recording on cleanup
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== "inactive") {
+        stopRecording();
+      }
     };
   }, [currentStream, startRecording, stopRecording]);
 
@@ -229,7 +238,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
 
   const confirmEndStream = useCallback(() => {
     recognitionRef.current?.stop();
-    
+
     const mediaRecorder = mediaRecorderRef.current;
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       const handleStop = () => {
@@ -237,7 +246,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
           router.push("/end");
         }, 500);
       };
-      
+
       mediaRecorder.addEventListener("stop", handleStop, { once: true });
       stopRecording();
     } else {
@@ -253,7 +262,6 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     },
     [setReactions]
   );
-
 
   useKeyboardShortcuts({
     stage: "live",
@@ -307,9 +315,7 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
         >
           <div
             className={`relative overflow-hidden ${
-              orientation === "horizontal"
-                ? "flex-1 h-full"
-                : "w-full h-full"
+              orientation === "horizontal" ? "flex-1 h-full" : "w-full h-full"
             }`}
           >
             <VideoFeed
@@ -330,7 +336,9 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
           )}
         </div>
 
-        {orientation === "vertical" && <LiveStageVertical {...liveStageProps} />}
+        {orientation === "vertical" && (
+          <LiveStageVertical {...liveStageProps} />
+        )}
 
         {isPracticeMode && (
           <PracticeMode
@@ -397,4 +405,3 @@ export const LiveStageContainer: React.FC<LiveStageContainerProps> = ({
     </>
   );
 };
-

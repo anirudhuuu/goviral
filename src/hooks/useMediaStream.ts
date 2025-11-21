@@ -91,16 +91,28 @@ export const useMediaStream = ({
     };
 
     startCamera();
+
+    // Cleanup function to stop tracks when component unmounts or dependencies change
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+    };
   }, [orientation, selectedVideoDeviceId, selectedAudioDeviceId, quality]);
 
   useEffect(() => {
     if (streamRef.current) {
-      streamRef.current
-        .getAudioTracks()
-        .forEach((track) => (track.enabled = !isMuted));
-      streamRef.current
-        .getVideoTracks()
-        .forEach((track) => (track.enabled = isVideoEnabled));
+      const audioTracks = streamRef.current.getAudioTracks();
+      const videoTracks = streamRef.current.getVideoTracks();
+
+      if (audioTracks.length > 0) {
+        audioTracks.forEach((track) => (track.enabled = !isMuted));
+      }
+
+      if (videoTracks.length > 0) {
+        videoTracks.forEach((track) => (track.enabled = isVideoEnabled));
+      }
     }
   }, [isMuted, isVideoEnabled]);
 

@@ -85,10 +85,15 @@ export const useRecording = (): UseRecordingReturn => {
         // Wait a bit to ensure all data chunks are collected
         setTimeout(() => {
           if (chunksRef.current.length > 0) {
-            let finalMimeType = mediaRecorder.mimeType || mimeType || "video/mp4";
-            
+            let finalMimeType =
+              mediaRecorder.mimeType || mimeType || "video/mp4";
+
             // Normalize mime type for better compatibility
-            if (finalMimeType.includes("mp4") || finalMimeType.includes("avc1") || finalMimeType.includes("h264")) {
+            if (
+              finalMimeType.includes("mp4") ||
+              finalMimeType.includes("avc1") ||
+              finalMimeType.includes("h264")
+            ) {
               // Ensure MP4 mime type is correct
               if (!finalMimeType.startsWith("video/mp4")) {
                 finalMimeType = "video/mp4";
@@ -100,19 +105,22 @@ export const useRecording = (): UseRecordingReturn => {
               // Default to MP4 for best compatibility
               finalMimeType = "video/mp4";
             }
-            
+
             setMimeType(finalMimeType);
-            
+
             // Create blob with all collected chunks
             const blob = new Blob(chunksRef.current, { type: finalMimeType });
-            
+
             // Verify blob size is reasonable (at least 1KB)
             if (blob.size > 1024) {
               const url = URL.createObjectURL(blob);
               setDownloadUrl(url);
             } else {
               if (process.env.NODE_ENV === "development") {
-                console.warn("Recording blob too small, may be incomplete:", blob.size);
+                console.warn(
+                  "Recording blob too small, may be incomplete:",
+                  blob.size
+                );
               }
               // Still set it, but warn
               const url = URL.createObjectURL(blob);
@@ -148,7 +156,7 @@ export const useRecording = (): UseRecordingReturn => {
       mediaRecorderRef.current.state !== "inactive"
     ) {
       const recorder = mediaRecorderRef.current;
-      
+
       // Request final data chunk before stopping to ensure all data is captured
       if (recorder.state === "recording") {
         try {
@@ -160,7 +168,7 @@ export const useRecording = (): UseRecordingReturn => {
           }
         }
       }
-      
+
       // Stop the recorder - onstop will handle blob creation
       try {
         if (recorder.state !== "inactive") {
@@ -179,23 +187,60 @@ export const useRecording = (): UseRecordingReturn => {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
+    // Stop recording if active
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+
     chunksRef.current = [];
     setRecordedChunks([]);
-    if (downloadUrl) {
-      URL.revokeObjectURL(downloadUrl);
-    }
-    setDownloadUrl(null);
+
+    // Use a ref to access current downloadUrl to avoid dependency
+    setDownloadUrl((currentUrl) => {
+      if (currentUrl) {
+        URL.revokeObjectURL(currentUrl);
+      }
+      return null;
+    });
+
     setDuration(0);
     setMimeType("video/mp4");
-  }, [downloadUrl]);
+  }, []);
 
   useEffect(() => {
     return () => {
+      // Cleanup on unmount
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      // Stop recording if still active
+      if (
+        mediaRecorderRef.current &&
+        mediaRecorderRef.current.state !== "inactive"
+      ) {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+      }
+
+      // Revoke blob URL to prevent memory leaks
+      if (downloadUrl) {
+        URL.revokeObjectURL(downloadUrl);
       }
     };
-  }, []);
+  }, [downloadUrl]);
 
   return {
     recordedChunks,

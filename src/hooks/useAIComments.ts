@@ -29,15 +29,16 @@ export const useAIComments = ({
 
   const processTranscript = useCallback(async () => {
     const bufferLength = transcriptBuffer.length;
-    const lastLength = lastProcessedTranscript.length;
+    const currentLastLength = lastProcessedTranscript.length;
 
-    if (bufferLength - lastLength > SPEECH_CONFIG.BUFFER_THRESHOLD) {
-      const newText = transcriptBuffer.substring(lastLength);
+    if (bufferLength - currentLastLength > SPEECH_CONFIG.BUFFER_THRESHOLD) {
+      const newText = transcriptBuffer.substring(currentLastLength);
+      // Update state immediately to prevent duplicate processing
       setLastProcessedTranscript(transcriptBuffer);
 
       const aiData = await aiService.generateResponse(
         newText,
-        lastProcessedTranscript,
+        transcriptBuffer.substring(0, currentLastLength), // Use the old lastProcessedTranscript value
         streamTopic
       );
 
